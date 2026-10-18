@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copy Trading Manager</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f172a">
+<link rel="icon" href="icon-192.png">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={darkMode:'class'}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<style>
+.c{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 3px #0002}
+.dark .c{background:#1e293b}
+input,select,textarea{width:100%;border:1px solid #94a3b8;border-radius:8px;padding:8px;background:transparent;color:inherit;margin-top:4px}
+select option{color:#000}
+button.b{background:#2563eb;color:#fff;border-radius:8px;padding:8px 14px}
+label{font-size:13px;display:block;margin-top:8px}
+@media print{nav,header,.noprint{display:none!important}}
+</style></head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen pb-20">
+<div id="app"></div>
+<div id="zoom" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onclick="this.classList.add('hidden')"><img id="zimg" class="max-h-full max-w-full"></div>
+<script>
+/* ====== STEP 1: apni 2 keys yahan paste karo (Supabase > Settings > API) ====== */
+const SUPABASE_URL='https://clxkaxvpqndzmzkhgabt.supabase.com';
+const SUPABASE_KEY='sb_publishable_5N8TARUQX88KmWsACvfhvg_5gARI8gx';   // sirf anon public key, service_role KABHI nahi
+
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+let me,cache={};
+const pages={};
+const TABS=[['dash','🏠 Home'],['inv','👤 Investors'],['acc','🏦 Accounts'],['tx','💸 Ledger'],['pl','📈 Daily P/L'],['rep','📄 Report']];
+
+// ---- light/dark mode ----
+if(localStorage.theme==='dark')document.documentElement.classList.add('dark');
+function toggleTheme(){localStorage.theme=document.documentElement.classList.toggle('dark')?'dark':'light'}
+
+// ---- data helper: table se rows lao ----
+async function q(t,sel='*',f=x=>x){const{data,error}=await f(sb.from(t).select(sel));if(error)alert(error.message);return data||[]}
+const card=(l,v)=>`<div class="c"><div class="text-xs opacity-70">${l}</div><div class="text-lg font-bold">${v}</div></div>`;
+
+// ================= LOGIN =================
+function loginView(){$('#app').innerHTML=`<div class="max-w-sm mx-auto p-6 pt-20"><h1 class="text-2xl font-bold mb-4">📊 Copy Trading Manager</h1><div class="c">
+<label>Email<input id="em" type="email"></label><label>Password<input id="pw" type="password"></label>
+<button class="b mt-4 w-full" onclick="login()">Login</button>
+<button class="mt-3 text-sm underline" onclick="signup()">Pehli baar? Account banao</button><p id="msg" class="text-red-500 text-sm mt-2"></p></div></div>`}
+async function login(){const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});error?$('#msg').textContent=error.message:start()}
+async function signup(){const{error}=await sb.auth.signUp({email:$('#em').value,password:$('#pw').value});$('#msg').textContent=error?error.message:'Email confirm karo, phir Login dabao'}
+
+async function start(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session)return loginView();
+  const{data:p}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
+  me={id:session.user.id,admin:p?.role==='admin'};
+  const tabs=me.admin?TABS:TABS.filter(t=>['dash','acc','tx','rep'].includes(t[0]));
+  $('#app').innerHTML=`<header class="flex justify-between items-center p-3 bg-slate-900 text-white"><b>📊 Copy Trading</b><span><button onclick="toggleTheme()">🌓</button> <button class="ml-3 text-sm" onclick="sb.auth.signOut().then(start)">Logout</button></span></header>
+  <main id="main" class="p-3 max-w-4xl mx-auto"></main>
+  <nav class="fixed bottom-0 inset-x-0 flex overflow-x-auto bg-white dark:bg-slate-800 border-t">${tabs.map(([k,l])=>`<button class="flex-1 min-w-[80px] py-3 text-xs" onclick="go('${k}')">${l}</button>`).join('')}</nav>`;
+  go('dash');
+}
+async function go(k){$('#main').innerHTML='Loading...';await pages[k]()}
+
+// ================= DASHBOARD =================
+pages.dash=async()=>{
+  const s=await q('investor_summary'),pl=await q('daily_profit'),acc=await q('accounts','id');
+  const sum=k=>s.reduce((a,r)=>a+Number(r[k]),0),t=today(),m=t.slice(0,7);
+  const tp=pl.filter(r=>r.pdate===t).reduce((a,r)=>a+Number(r.amount),0);
+  const mp=pl.filter(r=>r.pdate.startsWith(m)).reduce((a,r)=>a+Number(r.amount),0);
+  const pend=s.filter(r=>r.profit_pending>0);
+  $('#main').innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+  ${card('Investors',s.length)}${card('Accounts',acc.length)}${card('Total Invested',fmt(sum('invested')))}${card('Total Profit',fmt(sum('profit_earned')))}
+  ${card('Withdrawn',fmt(sum('withdrawn')))}${card('Remaining',fmt(sum('remaining')))}${card('Aaj ka Profit',fmt(tp))}${card('Is Mahine',fmt(mp))}</div>
+  <h3 class="font-bold mt-4 mb-2">⚠️ Pending Profit Payout</h3>
+  ${pend.map(r=>`<div class="c mb-2 flex justify-between"><span>${esc(r.name)}</span><b>${fmt(r.profit_pending)}</b></div>`).join('')||'<p class="text-sm opacity-70">Koi pending nahi ✅</p>'}`;
+};
+
+// ================= INVESTORS =================
+pages.inv=async()=>{
+  const s=await q('investor_summary');
+  $('#main').innerHTML=`<div class="c mb-3"><b>Naya Investor</b>
+  <label>Naam<input id="n"></label><label>Phone<input id="p"></label>
+  <label>Email (isi email se investor login karega)<input id="e" type="email"></label>
+  <label>Investor ka profit hissa % (jaise 70)<input id="s" type="number" value="100"></label>
+  <label>Notes / Address<textarea id="no"></textarea></label><button class="b mt-3" onclick="addInv()">Save</button></div>`
+  +s.map(r=>`<div class="c mb-2"><b>${esc(r.code)} · ${esc(r.name)}</b> <small>(${r.status})</small>
+  <div class="text-sm grid grid-cols-2 gap-1 mt-1"><span>Invested: ${fmt(r.invested)}</span><span>Withdrawn: ${fmt(r.withdrawn)}</span>
+  <span>Profit: ${fmt(r.profit_earned)}</span><span>Paid: ${fmt(r.profit_paid)}</span><span>Pending: ${fmt(r.profit_pending)}</span>
+  <span>Remaining: ${fmt(r.remaining)}</span><span>ROI: ${r.roi_pct}%</span><span>Share: ${r.share_pct}%</span></div></div>`).join('');
+};
+async function addInv(){
+  if(!$('#n').value.trim())return alert('Naam daalo');
+  const{error}=await sb.from('investors').insert({name:$('#n').value.trim(),phone:$('#p').value,email:$('#e').value.trim(),share_pct:Number($('#s').value),notes:$('#no').value});
+  error?alert(error.message):go('inv');
+}
+
+// ================= ACCOUNTS =================
+pages.acc=async()=>{
+  const inv=await q('investors','id,name'),a=await q('accounts','*,investors(name)');cache.acc=a;
+  const opt=inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  $('#main').innerHTML=(me.admin?`<div class="c mb-3"><b>Naya Trading Account</b>
+  <label>Investor<select id="ai">${opt}</select></label><label>Account Number<input id="an"></label>
+  <label>Broker<input id="ab"></label><label>Platform<select id="ap"><option>MT4</option><option>MT5</option><option>Other</option></select></label>
+  <label>Account Type<input id="at" placeholder="Standard / Cent / PAMM"></label>
+  <label>Starting Balance<input id="asb" type="number"></label><label>Start Date<input id="asd" type="date" value="${today()}"></label>
+  <button class="b mt-3" onclick="addAcc()">Save</button></div>`:'')
+  +a.map(r=>{const net=r.current_balance-r.start_balance,pc=r.start_balance>0?net/r.start_balance*100:0;
+  return `<div class="c mb-2"><b>${esc(r.account_no)}</b> · ${esc(r.investors?.name)} <small>${esc(r.broker)} ${esc(r.platform)}</small>
+  <div class="text-sm grid grid-cols-2 gap-1 mt-1"><span>Start: ${fmt(r.start_balance)}</span><span>Ab: <b>${fmt(r.current_balance)}</b></span>
+  <span class="${net>=0?'text-green-500':'text-red-500'}">Growth: ${fmt(net)} (${pc.toFixed(2)}%)</span><span>Start date: ${r.start_date}</span></div>
+  ${me.admin?`<button class="text-sm underline mt-2" onclick="updBal('${r.id}')">Current balance update</button>`:''}</div>`}).join('');
+};
+async function addAcc(){
+  const sb0=Number($('#asb').value)||0;
+  const{error}=await sb.from('accounts').insert({investor_id:$('#ai').value,account_no:$('#an').value,broker:$('#ab').value,platform:$('#ap').value,acc_type:$('#at').value,start_balance:sb0,current_balance:sb0,start_date:$('#asd').value});
+  error?alert(error.message):go('acc');
+}
+async function updBal(id){
+  const v=prompt('Naya current balance?');if(v===null||isNaN(v)||v==='')return;
+  const{error}=await sb.from('accounts').update({current_balance:Number(v)}).eq('id',id);error?alert(error.message):go('acc');
+}
+
+// ================= TRANSACTIONS + PROOF UPLOAD =================
+// photo ko upload se pehle chhota karna (max 1280px, JPEG 70%)
+function compress(file){return new Promise(r=>{const img=new Image();img.onload=()=>{const s=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',.7)};img.src=URL.createObjectURL(file)})}
+function zoom(u){$('#zimg').src=u;$('#zoom').classList.remove('hidden')}
+pages.tx=async()=>{
+  const a=await q('accounts','id,account_no,investor_id,investors(name)');cache.acc=a;
+  const tx=await q('transactions','*,investors(name)',x=>x.order('tx_date',{ascending:false}).limit(100));cache.tx=tx;
+  const paths=tx.flatMap(t=>t.proofs||[]);let urls={};
+  if(paths.length){const{data}=await sb.storage.from('proofs').createSignedUrls(paths,3600);(data||[]).forEach(d=>urls[d.path]=d.signedUrl)}
+  $('#main').innerHTML=(me.admin?`<div class="c mb-3"><b>Nayi Entry</b>
+  <label>Account<select id="ta">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
+  <label>Type<select id="tt"><option value="deposit">Deposit (investor ne diya)</option><option value="withdrawal">Withdrawal (investor ko wapas)</option><option value="profit_share">Profit Share</option><option value="profit_payout">Profit Payout (profit bheja)</option></select></label>
+  <label>Amount<input id="tm" type="number" step="any"></label><label>Currency<input id="tc" value="USD"></label>
+  <label>Date<input id="td" type="date" value="${today()}"></label><label>Payment Method<input id="tp"></label>
+  <label>Reference / Txn ID<input id="tr"></label><label>Notes<input id="tn"></label>
+  <label>Proof screenshot (camera ya gallery)<input id="tf" type="file" accept="image/*" multiple></label>
+  <button class="b mt-3" onclick="addTx()">Save Entry</button></div>`:'')
+  +tx.map(t=>`<div class="c mb-2"><div class="flex justify-between"><b>${esc(t.investors?.name)}</b><b class="${t.amount<0?'text-red-500':''}">${fmt(t.amount)} ${esc(t.currency)}</b></div>
+  <div class="text-xs opacity-70">${t.tx_date} · ${t.type} · ${esc(t.method)} ${esc(t.reference)} ${esc(t.notes)}</div>
+  <div class="flex gap-2 mt-1 flex-wrap">${(t.proofs||[]).map(p=>urls[p]?`<img src="${urls[p]}" class="w-14 h-14 object-cover rounded" onclick="zoom('${urls[p]}')">`:'').join('')}</div>
+  ${me.admin&&t.amount>0?`<button class="text-xs underline mt-1" onclick="reverseTx('${t.id}')">↩ Reverse (galti sudharo)</button>`:''}</div>`).join('');
+};
+async function addTx(){
+  const f=id=>$('#'+id).value,a=cache.acc.find(x=>x.id===f('ta'));
+  if(!a)return alert('Account chuno');const amt=Number(f('tm'));if(!amt)return alert('Amount sahi daalo');
+  const paths=[];
+  for(const file of [...$('#tf').files]){
+    const p=`${a.investor_id}/${crypto.randomUUID()}.jpg`;
+    const{error}=await sb.storage.from('proofs').upload(p,await compress(file),{contentType:'image/jpeg'});
+    if(error)return alert(error.message);paths.push(p);
+  }
+  const{error}=await sb.from('transactions').insert({investor_id:a.investor_id,account_id:a.id,type:f('tt'),amount:amt,currency:f('tc')||'USD',tx_date:f('td'),method:f('tp'),reference:f('tr'),notes:f('tn'),proofs:paths});
+  error?alert(error.message):go('tx');
+}
+// delete nahi hota: ulta (negative) entry banti hai
+async function reverseTx(id){
+  const t=cache.tx.find(x=>x.id===id);if(!confirm('Is entry ki reversing entry banayein?'))return;
+  const{error}=await sb.from('transactions').insert({investor_id:t.investor_id,account_id:t.account_id,type:t.type,amount:-t.amount,currency:t.currency,tx_date:today(),notes:'REVERSAL of '+id.slice(0,8)});
+  error?alert(error.message):go('tx');
+}
+
+// ================= DAILY PROFIT / LOSS =================
+pages.pl=async()=>{
+  const a=await q('accounts','id,account_no,investors(name)'),d=await q('daily_profit','*',x=>x.order('pdate',{ascending:false}));
+  const mon={};d.forEach(r=>{const m=r.pdate.slice(0,7);mon[m]=(mon[m]||0)+Number(r.amount)});
+  const mx=Math.max(1,...Object.values(mon).map(Math.abs));
+  $('#main').innerHTML=`<div class="c mb-3"><b>Daily Profit / Loss (loss ke liye minus likho)</b>
+  <label>Account<select id="pa">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
+  <label>Date<input id="pd" type="date" value="${today()}"></label><label>Amount<input id="pm" type="number" step="any"></label>
+  <button class="b mt-3" onclick="addPl()">Save</button></div>
+  <h3 class="font-bold mb-2">Monthly Summary</h3>
+  ${Object.entries(mon).sort().reverse().map(([m,v])=>`<div class="c mb-1 text-sm"><div class="flex justify-between"><span>${m}</span><b>${fmt(v)}</b></div><div style="height:6px;border-radius:3px;width:${Math.abs(v)/mx*100}%;background:${v>=0?'#22c55e':'#ef4444'}"></div></div>`).join('')}
+  <h3 class="font-bold mt-4 mb-2">Recent Daily</h3>
+  ${d.slice(0,30).map(r=>`<div class="c mb-1 text-sm flex justify-between"><span>${r.pdate}</span><b class="${r.amount<0?'text-red-500':'text-green-500'}">${fmt(r.amount)}</b></div>`).join('')}`;
+};
+async function addPl(){
+  const v=Number($('#pm').value);if(!$('#pm').value)return alert('Amount daalo');
+  const{error}=await sb.from('daily_profit').upsert({account_id:$('#pa').value,pdate:$('#pd').value,amount:v},{onConflict:'account_id,pdate'});
+  error?alert(error.message):go('pl');
+}
+
+// ================= REPORT (CSV + PDF) =================
+pages.rep=async()=>{
+  const inv=await q('investors','id,name');
+  $('#main').innerHTML=`<div class="c mb-3 noprint"><label>Investor<select id="ri">${inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label>
+  <label>From<input id="rf" type="date"></label><label>To<input id="rt" type="date" value="${today()}"></label>
+  <button class="b mt-3" onclick="runRep()">Dikhao</button></div><div id="out"></div>`;
+  if(inv.length)runRep();
+};
+async function runRep(){
+  const tx=await q('transactions','*',x=>{x=x.eq('investor_id',$('#ri').value).order('tx_date');if($('#rf').value)x=x.gte('tx_date',$('#rf').value);if($('#rt').value)x=x.lte('tx_date',$('#rt').value);return x});
+  cache.rep=tx;
+  $('#out').innerHTML=`<div class="noprint mb-2"><button class="b" onclick="csv()">⬇ CSV</button> <button class="b" onclick="print()">🖨 PDF / Print</button></div>
+  <h3 class="font-bold">Statement: ${esc($('#ri').selectedOptions[0]?.text)} (${$('#rf').value||'start'} → ${$('#rt').value})</h3>
+  <table class="w-full text-sm mt-2"><tr class="text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Ref</th></tr>
+  ${tx.map(t=>`<tr class="border-t"><td>${t.tx_date}</td><td>${t.type}</td><td>${fmt(t.amount)} ${esc(t.currency)}</td><td>${esc(t.reference)}</td></tr>`).join('')}</table>`;
+}
+function csv(){
+  const rows=[['Date','Type','Amount','Currency','Method','Reference','Notes'],...cache.rep.map(t=>[t.tx_date,t.type,t.amount,t.currency,t.method,t.reference,t.notes])];
+  const s=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='statement.csv';a.click();
+}
+
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+start();
+</script></body></html>
