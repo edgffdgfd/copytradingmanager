@@ -1,250 +1,99 @@
 <!DOCTYPE html>
-<html lang="hi"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Copy Trading Manager</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5">
-<link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap">
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<script>tailwind.config={darkMode:'class'}</script>
+<title>Copy Trading</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#16324F"><link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <style>
-:root{--bg:#EEF1FF;--card:#fff;--ink:#1E1B4B;--mut:#6B7280;--sh1:#fff;--sh2:rgba(79,70,229,.2)}
-.dark{--bg:#14122B;--card:#221F45;--ink:#F1F0FF;--mut:#A5A3C9;--sh1:rgba(255,255,255,.05);--sh2:rgba(0,0,0,.55)}
-html body{background:var(--bg);color:var(--ink);font-family:'Baloo 2',system-ui,-apple-system,sans-serif;font-size:16px;padding-bottom:100px}
-.c{background:var(--card);border-radius:22px;padding:16px;box-shadow:8px 8px 18px var(--sh2),-6px -6px 14px var(--sh1)}
-.c>b:first-child{font-size:18px}
-input,select,textarea{width:100%;border:2px solid transparent;border-radius:14px;padding:12px;font-size:16px;background:var(--bg);color:inherit;margin-top:4px;box-shadow:inset 3px 3px 7px var(--sh2),inset -3px -3px 7px var(--sh1)}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#6366F1}
-select option{color:#000}
-label{font-size:14px;font-weight:700;display:block;margin-top:12px;color:var(--mut)}
-button.b{background:linear-gradient(180deg,#818CF8,#4F46E5);color:#fff;border-radius:16px;padding:12px 22px;min-height:48px;font-weight:700;font-size:16px;box-shadow:0 5px 0 #3730A3,0 10px 16px rgba(79,70,229,.35);margin-bottom:6px}
-button.b:active{transform:translateY(4px);box-shadow:0 1px 0 #3730A3}
-button.b2{background:var(--bg);color:#4F46E5;border-radius:14px;padding:8px 16px;font-weight:700;font-size:14px;margin-top:10px;box-shadow:3px 3px 8px var(--sh2),-3px -3px 8px var(--sh1)}
-.hd{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;color:#fff;background:linear-gradient(120deg,#4F46E5,#7C3AED 60%,#DB2777);border-radius:0 0 26px 26px;box-shadow:0 8px 20px rgba(79,70,229,.35)}
-.hd .ic{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);font-size:18px}
-.hd .lo{background:rgba(255,255,255,.22);border-radius:999px;padding:8px 16px;font-weight:700;margin-left:8px}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:4px;padding:8px;background:var(--card);border-radius:26px 26px 0 0;box-shadow:0 -8px 24px var(--sh2);z-index:20;overflow-x:auto}
-nav button{flex:1;min-width:66px;padding:6px 4px;border-radius:18px;font-size:12px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center}
-nav i{font-style:normal;font-size:22px;line-height:1.2}
-nav button.on{background:linear-gradient(180deg,#818CF8,#4F46E5);color:#fff;box-shadow:0 4px 0 #3730A3}
-.tile{border-radius:22px;padding:14px;color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 6px 0 rgba(0,0,0,.2),0 14px 20px rgba(0,0,0,.15);margin-bottom:6px}
-.tile small{display:block;font-size:13px;opacity:.9;font-weight:500}.tile b{font-size:22px;line-height:1.2}.tile span{font-size:24px;float:right}
-.t1{background:linear-gradient(135deg,#818CF8,#4F46E5)}.t2{background:linear-gradient(135deg,#2DD4BF,#0D9488)}.t3{background:linear-gradient(135deg,#60A5FA,#2563EB)}.t4{background:linear-gradient(135deg,#4ADE80,#16A34A)}
-.t5{background:linear-gradient(135deg,#FBBF24,#EA580C)}.t6{background:linear-gradient(135deg,#C084FC,#7E22CE)}.t7{background:linear-gradient(135deg,#F472B6,#DB2777)}.t8{background:linear-gradient(135deg,#22D3EE,#0E7490)}
-.mini{background:var(--bg);border-radius:14px;padding:8px 10px;box-shadow:inset 2px 2px 5px var(--sh2),inset -2px -2px 5px var(--sh1)}
-.mini small{display:block;font-size:12px;color:var(--mut)}.mini b{font-size:16px}
-.bd{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#fff}
-.bd-deposit{background:#10B981}.bd-withdrawal{background:#F59E0B}.bd-profit_share{background:#6366F1}.bd-profit_payout{background:#EC4899}
-h3.st{font-size:18px;font-weight:700;margin:20px 0 10px}
-@media print{nav,header,.noprint{display:none!important}html body{background:#fff!important;color:#000!important}.c{box-shadow:none!important}}
+:root{--bg:#F3F5F4;--ink:#12201F;--mu:#5F6F6D;--ln:#DCE4E2;--br:#16324F;--pos:#0E7A52;--neg:#C0392B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'IBM Plex Sans',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+header{background:var(--br);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}header b{font-size:17px;font-weight:600}
+nav{background:#fff;border-bottom:1px solid var(--ln);display:flex;gap:4px;padding:0 12px;overflow-x:auto}
+nav button{padding:12px 14px;color:var(--mu);font-weight:500;border-bottom:3px solid transparent;white-space:nowrap}nav button.on{color:var(--br);border-color:var(--br)}
+main{max-width:1040px;margin:0 auto;padding:20px 14px 60px}
+button{font:inherit;background:none;border:0;cursor:pointer;color:inherit}
+.btn{background:var(--br);color:#fff;padding:10px 18px;border-radius:6px;font-weight:500;margin:4px 6px 0 0}.btn.o{background:#fff;color:var(--br);border:1px solid var(--ln)}
+.card{background:#fff;border:1px solid var(--ln);border-radius:8px;padding:16px;margin-bottom:16px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0 20px}
+.kp div{background:#fff;border:1px solid var(--ln);border-radius:8px;padding:14px}.kp small{display:block;color:var(--mu);font-size:13px}.kp b{font-size:22px;font-weight:600}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-weight:500;color:var(--mu);font-size:13px}td,th{padding:10px 8px;border-top:1px solid var(--ln)}th{border-top:0}.n{text-align:right}
+tr.go{cursor:pointer}tr.go:hover{background:var(--bg)}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.mu{color:var(--mu)}
+.bar{height:6px;background:var(--ln);border-radius:3px;min-width:70px}.bar i{display:block;height:100%;background:var(--br);border-radius:3px}
+input,select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--ln);border-radius:6px;background:#fff;margin:4px 0 10px}input[type=checkbox]{width:auto;margin:0 10px 0 0}
+label{font-size:13px;color:var(--mu);display:block}.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}
+h1{font-size:24px;margin:0 0 4px;font-weight:600}h2{font-size:18px;margin:24px 0 10px;font-weight:600}
+.ch{width:100%;height:110px}.ov{overflow-x:auto}
+@media print{header,nav,.np{display:none}}
 </style></head>
-<body class="min-h-screen">
-<div id="app"></div>
-<div id="zoom" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onclick="this.classList.add('hidden')"><img id="zimg" class="max-h-full max-w-full"></div>
+<body><div id="app"></div>
 <script>
-/* ====== STEP 1: apni 2 keys yahan paste karo (Supabase > Settings > API) ====== */
-const SUPABASE_URL='https://clxkaxvpqndzmzkhgabt.supabase.co';
-const SUPABASE_KEY='sb_publishable_5N8TARUQX88KmWsACvfhvg_5gARI8gx';   // sirf anon public key, service_role KABHI nahi
-
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
-const today=()=>new Date().toISOString().slice(0,10);
-let me,cache={};
-const pages={};
-const TABS=[['dash','🏠 Home'],['inv','👤 Investors'],['acc','🏦 Accounts'],['acx','🔑 Access'],['tx','💸 Ledger'],['pl','📈 Daily P/L'],['rep','📄 Report']];
-
-// ---- logo (bhi alag file logo.svg me hai) ----
-const LOGO=s=>`<svg width="${s}" height="${s}" viewBox="0 0 96 96" style="filter:drop-shadow(0 5px 6px rgba(0,0,0,.3))"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366F1"/><stop offset=".55" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs><rect width="96" height="96" rx="24" fill="url(#lg)"/><rect x="3" y="3" width="90" height="44" rx="21" fill="#fff" opacity=".14"/><g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M26 46v-4M26 78v-4M48 34v-4M48 78v-4M70 22v-4M70 78v-4"/></g><rect x="19" y="46" width="14" height="28" rx="5" fill="#FDE68A"/><rect x="41" y="34" width="14" height="40" rx="5" fill="#6EE7B7"/><rect x="63" y="22" width="14" height="52" rx="5" fill="#fff"/><path d="M14 52L38 38l12 6 28-22" fill="none" stroke="#FBBF24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M66 20h14v14" fill="none" stroke="#FBBF24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-// ---- light/dark mode ----
-if(localStorage.theme==='dark')document.documentElement.classList.add('dark');
-function toggleTheme(){localStorage.theme=document.documentElement.classList.toggle('dark')?'dark':'light'}
-
-// ---- data helper: table se rows lao ----
+const sb=supabase.createClient('https://clxkaxvpqndzmzkhgabt.supabase.co','sb_publishable_5N8TARUQX88KmWsACvfhvg_5gARI8gx');
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}),today=()=>new Date().toISOString().slice(0,10);
+const sg=n=>`<b class="${n<0?'neg':'pos'}">${n>0?'+':''}${fmt(n)}</b>`,sum=(a,f)=>a.reduce((s,r)=>s+Number(f(r)||0),0);
+let me,D={},RP=[];const pages={};
 async function q(t,sel='*',f=x=>x){const{data,error}=await f(sb.from(t).select(sel));if(error)alert(error.message);return data||[]}
-const card=(l,v,c,i)=>`<div class="tile ${c}"><span>${i}</span><small>${l}</small><b>${v}</b></div>`;
-const mini=(l,v,c='')=>`<div class="mini"><small>${l}</small><b class="${c}">${v}</b></div>`;
+async function load(){const[i,a,t,p]=await Promise.all([q('investors','id,name,code'),q('accounts'),q('transactions','*',x=>x.order('tx_date',{ascending:false})),q('daily_profit','*',x=>x.order('pdate',{ascending:false}))]);
+ D={inv:i,nm:Object.fromEntries(i.map(r=>[r.id,r.name])),acc:[...new Map(a.map(r=>[r.id,r])).values()],tx:t,pl:p}}
+function st(a){const t=D.tx.filter(x=>x.account_id===a.id),p=D.pl.filter(x=>x.account_id===a.id),f=k=>sum(t.filter(x=>x.type===k),x=>x.amount),inv=f('deposit'),wd=f('withdrawal');
+ return{t,p,inv,wd,pr:sum(p,x=>x.amount),bal:Number(a.current_balance||0),left:inv-wd,ret:inv>0?wd/inv*100:0}}
+const agg=l=>{const s=l.map(st);return{inv:sum(s,x=>x.inv),wd:sum(s,x=>x.wd),pr:sum(s,x=>x.pr),bal:sum(s,x=>x.bal),left:sum(s,x=>x.left)}};
+const kp=s=>`<div class="kp"><div><small>Invested</small><b>${fmt(s.inv)}</b></div><div><small>Withdrawn</small><b>${fmt(s.wd)}</b></div><div><small>Still to recover</small><b>${fmt(Math.max(s.left,0))}</b></div><div><small>Profit / loss</small>${sg(s.pr)}</div><div><small>Account balance</small><b>${fmt(s.bal)}</b></div></div>`;
+function bars(p){const d=p.slice(0,30).reverse();if(!d.length)return'<p class="mu">No daily profit or loss recorded yet.</p>';const mx=Math.max(...d.map(r=>Math.abs(r.amount)),1),w=300/d.length;
+ return`<svg viewBox="0 0 300 100" preserveAspectRatio="none" class="ch">${d.map((r,i)=>{const h=Math.abs(r.amount)/mx*46;return`<rect x="${i*w+1}" y="${r.amount>=0?50-h:50}" width="${w-2}" height="${Math.max(h,1)}" fill="${r.amount>=0?'#0E7A52':'#C0392B'}"><title>${r.pdate}: ${fmt(r.amount)}</title></rect>`}).join('')}<line x1="0" x2="300" y1="50" y2="50" stroke="#C9D3D1" vector-effect="non-scaling-stroke"/></svg><p class="mu" style="margin:6px 0 0">Last ${d.length} days</p>`}
 
-// ================= LOGIN =================
-function loginView(){$('#app').innerHTML=`<div class="max-w-sm mx-auto p-6 pt-12 text-center"><div class="flex justify-center">${LOGO(96)}</div>
-<h1 class="text-3xl font-bold mt-3">Copy Trading Manager</h1><p class="mb-6" style="color:var(--mut)">Investors ka hisaab, saaf aur simple</p><div class="c text-left">
-<label>Email<input id="em" type="email"></label><label>Password<input id="pw" type="password"></label>
-<button class="b mt-4 w-full" onclick="login()">Login</button>
-<button class="mt-3 text-sm underline" onclick="signup()">Pehli baar? Account banao</button><p id="msg" class="text-red-500 text-sm mt-2"></p></div></div>`}
+function loginView(){$('#app').innerHTML=`<div style="max-width:360px;margin:12vh auto;padding:0 16px"><h1>Copy Trading</h1><p class="mu">Sign in to view your investments.</p><div class="card"><label>Email<input id="em" type="email"></label><label>Password<input id="pw" type="password"></label><button class="btn" style="width:100%" onclick="login()">Sign in</button><p id="msg" class="neg"></p></div></div>`}
 async function login(){const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});error?$('#msg').textContent=error.message:start()}
-async function signup(){const{error}=await sb.auth.signUp({email:$('#em').value,password:$('#pw').value});$('#msg').textContent=error?error.message:'Email confirm karo, phir Login dabao'}
+async function start(){const{data:{session}}=await sb.auth.getSession();if(!session)return loginView();
+ const{data:p}=await sb.from('profiles').select('role').eq('id',session.user.id).single();me={id:session.user.id,admin:p?.role==='admin'};
+ const T=me.admin?[['dash','Overview'],['mg','Manage'],['acx','Access'],['rep','Statement']]:[['dash','Overview'],['rep','Statement']];
+ $('#app').innerHTML=`<header><b>Copy Trading</b><button onclick="sb.auth.signOut().then(start)">Sign out</button></header><nav>${T.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('')}</nav><main id="main"></main>`;go('dash')}
+async function go(k,a){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===(k==='ac'?'dash':k)));$('#main').innerHTML='<p class="mu">Loading…</p>';await pages[k](a);scrollTo(0,0)}
 
-async function start(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session)return loginView();
-  const{data:p}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
-  me={id:session.user.id,admin:p?.role==='admin'};
-  const tabs=me.admin?TABS:TABS.filter(t=>['dash','acc','tx','rep'].includes(t[0]));
-  $('#app').innerHTML=`<header class="hd"><span class="flex items-center gap-2 text-lg font-bold">${LOGO(38)} Copy Trading</span><span class="flex items-center"><button class="ic" onclick="toggleTheme()">🌓</button><button class="lo" onclick="sb.auth.signOut().then(start)">Logout</button></span></header>
-  <main id="main" class="p-3 pt-5 max-w-4xl mx-auto"></main>
-  <nav>${tabs.map(([k,l])=>{const[e,...t]=l.split(' ');return `<button data-k="${k}" onclick="go('${k}')"><i>${e}</i>${t.join(' ')}</button>`}).join('')}</nav>`;
-  go('dash');
-}
-async function go(k){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));$('#main').innerHTML='<p class="text-center" style="color:var(--mut)">Loading...</p>';await pages[k]();scrollTo(0,0)}
+pages.dash=async()=>{await load();const A=D.acc;
+ if(!A.length)return $('#main').innerHTML=`<div class="card">${me.admin?'No accounts yet. Add one under Manage.':'No accounts have been shared with you yet. Please contact your administrator.'}</div>`;
+ const dup=A.length-new Set(A.map(a=>a.investor_id+'|'+a.account_no)).size,g={};A.forEach(a=>(g[a.investor_id]??=[]).push(a));
+ $('#main').innerHTML=`<h1>${me.admin?'Portfolio overview':'Your investments'}</h1><p class="mu">${A.length} account${A.length>1?'s':''}</p>`
+ +(me.admin&&dup?`<div class="card neg">${dup} duplicate account entr${dup>1?'ies':'y'} found (same investor and account number). Remove the extras under Manage.</div>`:'')
+ +kp(agg(A))+Object.entries(g).map(([i,l])=>{const s=agg(l);return`<h2>${esc(D.nm[i])}</h2><div class="card ov"><table><tr><th>Account</th><th class="n">Invested</th><th class="n">Withdrawn</th><th class="n">Profit / loss</th><th>Recovered</th></tr>${l.map(a=>{const x=st(a);return`<tr class="go" onclick="go('ac','${a.id}')"><td><b>${esc(a.account_no)}</b><br><span class="mu">${esc(a.broker)} ${esc(a.platform)}</span></td><td class="n">${fmt(x.inv)}</td><td class="n">${fmt(x.wd)}</td><td class="n">${sg(x.pr)}</td><td><div class="bar"><i style="width:${Math.min(x.ret,100)}%"></i></div><span class="mu">${x.ret.toFixed(1)}%</span></td></tr>`}).join('')}<tr><td><b>Total</b></td><td class="n"><b>${fmt(s.inv)}</b></td><td class="n"><b>${fmt(s.wd)}</b></td><td class="n">${sg(s.pr)}</td><td></td></tr></table></div>`}).join('')};
 
-// ================= DASHBOARD =================
-pages.dash=async()=>{
-  const s=await q('investor_summary'),pl=await q('daily_profit'),acc=await q('accounts','id');
-  const sum=k=>s.reduce((a,r)=>a+Number(r[k]),0),t=today(),m=t.slice(0,7);
-  const tp=pl.filter(r=>r.pdate===t).reduce((a,r)=>a+Number(r.amount),0);
-  const mp=pl.filter(r=>r.pdate.startsWith(m)).reduce((a,r)=>a+Number(r.amount),0);
-  const pend=s.filter(r=>r.profit_pending>0);
-  if(!me.admin&&!acc.length)return $('#main').innerHTML='<div class="c text-center">🔒 Abhi aapko koi account allow nahi hua. Admin se baat karein.</div>';
-  $('#main').innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-  ${card('Investors',s.length,'t1','👥')}${card('Accounts',acc.length,'t2','🏦')}${card('Total Invested',fmt(sum('invested')),'t3','💰')}${card('Total Profit',fmt(sum('profit_earned')),'t4','📈')}
-  ${card('Withdrawn',fmt(sum('withdrawn')),'t5','💸')}${card('Remaining',fmt(sum('remaining')),'t6','🪙')}${card('Aaj ka Profit',fmt(tp),'t7','☀️')}${card('Is Mahine',fmt(mp),'t8','📅')}</div>
-  <h3 class="st">⚠️ Pending Profit Payout</h3>
-  ${pend.map(r=>`<div class="c mb-3 flex justify-between items-center"><span>${esc(r.name)}</span><span class="bd bd-profit_payout" style="font-size:15px">${fmt(r.profit_pending)}</span></div>`).join('')||'<div class="c text-center">Koi pending nahi ✅</div>'}`;
-};
+const entryForm=a=>`<h2>Add entry</h2><div class="card np"><div class="fg"><label>Type<select id="et"><option value="deposit">Deposit (invested)</option><option value="withdrawal">Withdrawal (paid back)</option><option value="profit_share">Profit share</option><option value="profit_payout">Profit payout</option><option value="daily">Daily profit / loss</option></select></label><label>Amount (minus for a loss)<input id="ea" type="number" step="any"></label><label>Date<input id="ed" type="date" value="${today()}"></label><label>Currency<input id="ec" value="USD"></label><label>Reference<input id="er"></label><label>Notes<input id="en"></label></div><label>Proof photos<input id="ef" type="file" accept="image/*" multiple></label><button class="btn" onclick="addE('${a.id}')">Save entry</button><button class="btn o" onclick="upBal('${a.id}')">Update balance</button><button class="btn o neg" onclick="delAcc('${a.id}')">Delete account</button></div>`;
+pages.ac=async id=>{await load();const a=D.acc.find(x=>x.id===id);if(!a)return go('dash');const x=st(a),urls={},paths=x.t.flatMap(t=>t.proofs||[]),mon={};
+ if(paths.length){const{data}=await sb.storage.from('proofs').createSignedUrls(paths,3600);(data||[]).forEach(d=>urls[d.path]=d.signedUrl)}
+ x.p.forEach(r=>{const m=r.pdate.slice(0,7);mon[m]=(mon[m]||0)+Number(r.amount)});
+ $('#main').innerHTML=`<button class="mu np" onclick="go('dash')">← Back to overview</button><h1>${esc(D.nm[a.investor_id])} · ${esc(a.account_no)}</h1><p class="mu">${esc(a.broker)} ${esc(a.platform)} ${esc(a.acc_type)} · started ${a.start_date||'n/a'}</p>${kp(x)}
+ <h2>Daily profit / loss</h2><div class="card">${bars(x.p)}</div>
+ <h2>Monthly result</h2><div class="card ov"><table>${Object.entries(mon).sort().reverse().map(([m,v])=>`<tr><td>${m}</td><td class="n">${sg(v)}</td></tr>`).join('')||'<tr><td class="mu">Nothing recorded yet.</td></tr>'}</table></div>
+ ${me.admin?entryForm(a):''}
+ <h2>Money in and out</h2><div class="card ov"><table>${x.t.map(t=>`<tr><td>${t.tx_date}</td><td>${esc(t.type.replace('_',' '))}</td><td class="n">${fmt(t.amount)} ${esc(t.currency)}</td><td class="mu">${esc(t.reference)} ${esc(t.notes)}</td><td>${(t.proofs||[]).map(p=>urls[p]?`<a href="${urls[p]}" target="_blank">proof</a>`:'').join(' ')}</td>${me.admin&&t.amount>0?`<td class="np"><button class="mu" onclick="rev('${t.id}')">Reverse</button></td>`:''}</tr>`).join('')||'<tr><td class="mu">No entries yet.</td></tr>'}</table></div>`};
+function compress(file){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',.7)};i.src=URL.createObjectURL(file)})}
+async function addE(id){const f=k=>$('#'+k).value,v=Number(f('ea')),a=D.acc.find(x=>x.id===id);if(!f('ea'))return alert('Enter an amount');let e;
+ if(f('et')==='daily')({error:e}=await sb.from('daily_profit').upsert({account_id:id,pdate:f('ed'),amount:v},{onConflict:'account_id,pdate'}));
+ else{const ps=[];for(const file of $('#ef').files){const p=`${a.investor_id}/${crypto.randomUUID()}.jpg`,{error}=await sb.storage.from('proofs').upload(p,await compress(file),{contentType:'image/jpeg'});if(error)return alert(error.message);ps.push(p)}
+  ({error:e}=await sb.from('transactions').insert({investor_id:a.investor_id,account_id:id,type:f('et'),amount:v,currency:f('ec')||'USD',tx_date:f('ed'),reference:f('er'),notes:f('en'),proofs:ps}))}
+ e?alert(e.message):go('ac',id)}
+async function rev(id){const t=D.tx.find(x=>x.id===id);if(!confirm('Create a reversing entry?'))return;const{error}=await sb.from('transactions').insert({investor_id:t.investor_id,account_id:t.account_id,type:t.type,amount:-t.amount,currency:t.currency,tx_date:today(),notes:'REVERSAL of '+id.slice(0,8)});error?alert(error.message):go('ac',t.account_id)}
+async function upBal(id){const v=prompt('New account balance?');if(v===null||v===''||isNaN(v))return;const{error}=await sb.from('accounts').update({current_balance:Number(v)}).eq('id',id);error?alert(error.message):go('ac',id)}
+async function delAcc(id){if(!confirm('Delete this account and its entries?'))return;const{error}=await sb.from('accounts').delete().eq('id',id);error?alert(error.message):go('mg')}
 
-// ================= ACCESS (admin: kis login ko kaun sa account dikhe) =================
-pages.acx=async()=>{
-  const{data:lg,error}=await sb.rpc('admin_list_logins');if(error)alert(error.message);
-  let a=await q('accounts','id,account_no,investors(name)'),ac=await q('account_access');a=[...new Map(a.map(x=>[x.id,x])).values()];
-  const users=(lg||[]).filter(u=>u.role!=='admin');
-  $('#main').innerHTML=`<div class="c mb-4"><b>🔑 Access dena</b><div class="text-sm" style="color:var(--mut)">Jis account par ✅ lagega, sirf wahi us login ko dikhega. Admin ko sab dikhta hai.</div></div>`
-  +(users.map(u=>`<div class="c mb-4"><b class="text-lg">${esc(u.email)}</b>
-  ${a.map(x=>`<label class="flex items-center gap-3" style="font-size:16px;color:inherit"><input type="checkbox" style="width:26px;height:26px;margin:0;box-shadow:none" ${ac.some(r=>r.user_id===u.id&&r.account_id===x.id)?'checked':''} onchange="setAcc('${u.id}','${x.id}',this.checked)"><span>${esc(x.investors?.name)} · ${esc(x.account_no)}</span></label>`).join('')||'<p>Pehle account banao</p>'}</div>`).join('')||'<div class="c">Koi investor login nahi mila. Supabase me Authentication → Add user se banao.</div>');
-};
-async function setAcc(u,a,on){
-  const{error}=on?await sb.from('account_access').insert({user_id:u,account_id:a}):await sb.from('account_access').delete().eq('user_id',u).eq('account_id',a);
-  if(error){alert(error.message);go('acx')}
-}
+pages.mg=async()=>{await load();$('#main').innerHTML=`<h1>Manage</h1><h2>Add investor</h2><div class="card"><div class="fg"><label>Name<input id="n"></label><label>Phone<input id="p"></label><label>Email (record only)<input id="e"></label><label>Profit share %<input id="s" type="number" value="100"></label></div><button class="btn" onclick="addInv()">Save investor</button></div>
+ <h2>Add trading account</h2><div class="card"><div class="fg"><label>Investor<select id="ai">${D.inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label><label>Account number<input id="an"></label><label>Broker<input id="ab"></label><label>Platform<select id="ap"><option>MT4</option><option>MT5</option><option>Other</option></select></label><label>Account type<input id="at"></label><label>Starting balance<input id="asb" type="number"></label><label>Start date<input id="asd" type="date" value="${today()}"></label></div><button class="btn" onclick="addAcc()">Save account</button></div>
+ <h2>All accounts</h2><div class="card ov"><table><tr><th>Investor</th><th>Account</th><th>ID</th><th></th></tr>${D.acc.map(a=>`<tr><td>${esc(D.nm[a.investor_id])}</td><td>${esc(a.account_no)}</td><td class="mu">${a.id.slice(0,6)}</td><td><button class="neg" onclick="delAcc('${a.id}')">Delete</button></td></tr>`).join('')}</table></div>`};
+async function addInv(){const n=$('#n').value.trim();if(!n)return alert('Enter a name');const{error}=await sb.from('investors').insert({name:n,phone:$('#p').value,email:$('#e').value.trim(),share_pct:Number($('#s').value)});error?alert(error.message):go('mg')}
+async function addAcc(){const b=Number($('#asb').value)||0,{error}=await sb.from('accounts').insert({investor_id:$('#ai').value,account_no:$('#an').value,broker:$('#ab').value,platform:$('#ap').value,acc_type:$('#at').value,start_balance:b,current_balance:b,start_date:$('#asd').value});error?alert(error.message):go('mg')}
 
-// ================= INVESTORS =================
-pages.inv=async()=>{
-  const s=await q('investor_summary');
-  $('#main').innerHTML=`<div class="c mb-4"><b>➕ Naya Investor</b>
-  <label>Naam<input id="n"></label><label>Phone<input id="p"></label>
-  <label>Email (sirf record ke liye)<input id="e" type="email"></label>
-  <label>Investor ka profit hissa % (jaise 70)<input id="s" type="number" value="100"></label>
-  <label>Notes / Address<textarea id="no"></textarea></label><button class="b mt-4" onclick="addInv()">Save</button></div>`
-  +s.map(r=>`<div class="c mb-4"><div class="flex justify-between items-center"><b class="text-lg">${esc(r.code)} · ${esc(r.name)}</b><span class="bd bd-profit_share">${esc(r.status)}</span></div>
-  <div class="grid grid-cols-2 gap-2 mt-3">${mini('Invested',fmt(r.invested))}${mini('Withdrawn',fmt(r.withdrawn))}${mini('Profit',fmt(r.profit_earned),'text-green-600')}${mini('Paid',fmt(r.profit_paid))}
-  ${mini('Pending',fmt(r.profit_pending),'text-red-500')}${mini('Remaining',fmt(r.remaining))}${mini('ROI',r.roi_pct+'%')}${mini('Share',r.share_pct+'%')}</div></div>`).join('');
-};
-async function addInv(){
-  if(!$('#n').value.trim())return alert('Naam daalo');
-  const{error}=await sb.from('investors').insert({name:$('#n').value.trim(),phone:$('#p').value,email:$('#e').value.trim(),share_pct:Number($('#s').value),notes:$('#no').value});
-  error?alert(error.message):go('inv');
-}
+pages.acx=async()=>{await load();const{data:lg,error}=await sb.rpc('admin_list_logins');if(error)alert(error.message);const ac=await q('account_access'),us=(lg||[]).filter(u=>u.role!=='admin');
+ $('#main').innerHTML=`<h1>Access</h1><p class="mu">Tick an account to let that login see it. Admins always see everything.</p>`+(us.map(u=>`<div class="card"><b>${esc(u.email)}</b><div style="margin-top:10px">${D.acc.map(a=>`<label style="display:flex;align-items:center;color:var(--ink);font-size:15px;padding:5px 0"><input type="checkbox" ${ac.some(r=>r.user_id===u.id&&r.account_id===a.id)?'checked':''} onchange="setAcc('${u.id}','${a.id}',this.checked)">${esc(D.nm[a.investor_id])} · ${esc(a.account_no)}&nbsp;<span class="mu">${esc(a.broker)} · ${a.id.slice(0,4)}</span></label>`).join('')}</div></div>`).join('')||'<div class="card">No investor logins yet. Add users in Supabase under Authentication.</div>')};
+async function setAcc(u,a,on){const{error}=on?await sb.from('account_access').insert({user_id:u,account_id:a}):await sb.from('account_access').delete().eq('user_id',u).eq('account_id',a);if(error){alert(error.message);go('acx')}}
 
-// ================= ACCOUNTS =================
-pages.acc=async()=>{
-  const inv=await q('investors','id,name'),a=await q('accounts','*,investors(name)');cache.acc=a;
-  const opt=inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
-  $('#main').innerHTML=(me.admin?`<div class="c mb-4"><b>➕ Naya Trading Account</b>
-  <label>Investor<select id="ai">${opt}</select></label><label>Account Number<input id="an"></label>
-  <label>Broker<input id="ab"></label><label>Platform<select id="ap"><option>MT4</option><option>MT5</option><option>Other</option></select></label>
-  <label>Account Type<input id="at" placeholder="Standard / Cent / PAMM"></label>
-  <label>Starting Balance<input id="asb" type="number"></label><label>Start Date<input id="asd" type="date" value="${today()}"></label>
-  <button class="b mt-4" onclick="addAcc()">Save</button></div>`:'')
-  +a.map(r=>{const net=r.current_balance-r.start_balance,pc=r.start_balance>0?net/r.start_balance*100:0;
-  return `<div class="c mb-4"><b class="text-lg">${esc(r.account_no)}</b> · ${esc(r.investors?.name)} <small style="color:var(--mut)">${esc(r.broker)} ${esc(r.platform)}</small>
-  <div class="grid grid-cols-2 gap-2 mt-3">${mini('Start',fmt(r.start_balance))}${mini('Ab',fmt(r.current_balance))}
-  ${mini('Growth',fmt(net)+' ('+pc.toFixed(2)+'%)',net>=0?'text-green-600':'text-red-500')}${mini('Start date',r.start_date)}</div>
-  ${me.admin?`<button class="b2" onclick="updBal('${r.id}')">✏️ Current balance update</button>`:''}</div>`}).join('');
-};
-async function addAcc(){
-  const sb0=Number($('#asb').value)||0;
-  const{error}=await sb.from('accounts').insert({investor_id:$('#ai').value,account_no:$('#an').value,broker:$('#ab').value,platform:$('#ap').value,acc_type:$('#at').value,start_balance:sb0,current_balance:sb0,start_date:$('#asd').value});
-  error?alert(error.message):go('acc');
-}
-async function updBal(id){
-  const v=prompt('Naya current balance?');if(v===null||isNaN(v)||v==='')return;
-  const{error}=await sb.from('accounts').update({current_balance:Number(v)}).eq('id',id);error?alert(error.message):go('acc');
-}
-
-// ================= TRANSACTIONS + PROOF UPLOAD =================
-// photo ko upload se pehle chhota karna (max 1280px, JPEG 70%)
-function compress(file){return new Promise(r=>{const img=new Image();img.onload=()=>{const s=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(r,'image/jpeg',.7)};img.src=URL.createObjectURL(file)})}
-function zoom(u){$('#zimg').src=u;$('#zoom').classList.remove('hidden')}
-pages.tx=async()=>{
-  const a=await q('accounts','id,account_no,investor_id,investors(name)');cache.acc=a;
-  const tx=await q('transactions','*,investors(name)',x=>x.order('tx_date',{ascending:false}).limit(100));cache.tx=tx;
-  const paths=tx.flatMap(t=>t.proofs||[]);let urls={};
-  if(paths.length){const{data}=await sb.storage.from('proofs').createSignedUrls(paths,3600);(data||[]).forEach(d=>urls[d.path]=d.signedUrl)}
-  $('#main').innerHTML=(me.admin?`<div class="c mb-4"><b>➕ Nayi Entry</b>
-  <label>Account<select id="ta">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
-  <label>Type<select id="tt"><option value="deposit">Deposit (investor ne diya)</option><option value="withdrawal">Withdrawal (investor ko wapas)</option><option value="profit_share">Profit Share</option><option value="profit_payout">Profit Payout (profit bheja)</option></select></label>
-  <label>Amount<input id="tm" type="number" step="any"></label><label>Currency<input id="tc" value="USD"></label>
-  <label>Date<input id="td" type="date" value="${today()}"></label><label>Payment Method<input id="tp"></label>
-  <label>Reference / Txn ID<input id="tr"></label><label>Notes<input id="tn"></label>
-  <label>Proof screenshot (camera ya gallery)<input id="tf" type="file" accept="image/*" multiple></label>
-  <button class="b mt-4" onclick="addTx()">Save Entry</button></div>`:'')
-  +tx.map(t=>`<div class="c mb-3"><div class="flex justify-between items-center"><b>${esc(t.investors?.name)}</b><b class="text-lg ${t.amount<0?'text-red-500':'text-green-600'}">${fmt(t.amount)} ${esc(t.currency)}</b></div>
-  <div class="mt-1"><span class="bd bd-${esc(t.type)}">${esc(t.type)}</span> <span class="text-xs" style="color:var(--mut)">${t.tx_date} · ${esc(t.method)} ${esc(t.reference)} ${esc(t.notes)}</span></div>
-  <div class="flex gap-2 mt-2 flex-wrap">${(t.proofs||[]).map(p=>urls[p]?`<img src="${urls[p]}" class="w-16 h-16 object-cover rounded-xl" onclick="zoom('${urls[p]}')">`:'').join('')}</div>
-  ${me.admin&&t.amount>0?`<button class="b2" onclick="reverseTx('${t.id}')">↩ Reverse (galti sudharo)</button>`:''}</div>`).join('');
-};
-async function addTx(){
-  const f=id=>$('#'+id).value,a=cache.acc.find(x=>x.id===f('ta'));
-  if(!a)return alert('Account chuno');const amt=Number(f('tm'));if(!amt)return alert('Amount sahi daalo');
-  const paths=[];
-  for(const file of [...$('#tf').files]){
-    const p=`${a.investor_id}/${crypto.randomUUID()}.jpg`;
-    const{error}=await sb.storage.from('proofs').upload(p,await compress(file),{contentType:'image/jpeg'});
-    if(error)return alert(error.message);paths.push(p);
-  }
-  const{error}=await sb.from('transactions').insert({investor_id:a.investor_id,account_id:a.id,type:f('tt'),amount:amt,currency:f('tc')||'USD',tx_date:f('td'),method:f('tp'),reference:f('tr'),notes:f('tn'),proofs:paths});
-  error?alert(error.message):go('tx');
-}
-// delete nahi hota: ulta (negative) entry banti hai
-async function reverseTx(id){
-  const t=cache.tx.find(x=>x.id===id);if(!confirm('Is entry ki reversing entry banayein?'))return;
-  const{error}=await sb.from('transactions').insert({investor_id:t.investor_id,account_id:t.account_id,type:t.type,amount:-t.amount,currency:t.currency,tx_date:today(),notes:'REVERSAL of '+id.slice(0,8)});
-  error?alert(error.message):go('tx');
-}
-
-// ================= DAILY PROFIT / LOSS =================
-pages.pl=async()=>{
-  const a=await q('accounts','id,account_no,investors(name)'),d=await q('daily_profit','*',x=>x.order('pdate',{ascending:false}));
-  const mon={};d.forEach(r=>{const m=r.pdate.slice(0,7);mon[m]=(mon[m]||0)+Number(r.amount)});
-  const mx=Math.max(1,...Object.values(mon).map(Math.abs));
-  $('#main').innerHTML=`<div class="c mb-4"><b>➕ Daily Profit / Loss</b><div class="text-sm" style="color:var(--mut)">Loss ke liye minus likho</div>
-  <label>Account<select id="pa">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
-  <label>Date<input id="pd" type="date" value="${today()}"></label><label>Amount<input id="pm" type="number" step="any"></label>
-  <button class="b mt-4" onclick="addPl()">Save</button></div>
-  <h3 class="st">📅 Monthly Summary</h3>
-  ${Object.entries(mon).sort().reverse().map(([m,v])=>`<div class="c mb-3"><div class="flex justify-between"><span>${m}</span><b class="${v>=0?'text-green-600':'text-red-500'}">${fmt(v)}</b></div><div style="height:10px;border-radius:6px;margin-top:6px;width:${Math.abs(v)/mx*100}%;background:${v>=0?'linear-gradient(90deg,#4ADE80,#16A34A)':'linear-gradient(90deg,#FB7185,#DC2626)'}"></div></div>`).join('')}
-  <h3 class="st">🗓 Recent Daily</h3>
-  ${d.slice(0,30).map(r=>`<div class="c mb-2 flex justify-between"><span>${r.pdate}</span><b class="${r.amount<0?'text-red-500':'text-green-600'}">${fmt(r.amount)}</b></div>`).join('')}`;
-};
-async function addPl(){
-  const v=Number($('#pm').value);if(!$('#pm').value)return alert('Amount daalo');
-  const{error}=await sb.from('daily_profit').upsert({account_id:$('#pa').value,pdate:$('#pd').value,amount:v},{onConflict:'account_id,pdate'});
-  error?alert(error.message):go('pl');
-}
-
-// ================= REPORT (CSV + PDF) =================
-pages.rep=async()=>{
-  const inv=await q('investors','id,name');
-  $('#main').innerHTML=`<div class="c mb-4 noprint"><label>Investor<select id="ri">${inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label>
-  <label>From<input id="rf" type="date"></label><label>To<input id="rt" type="date" value="${today()}"></label>
-  <button class="b mt-4" onclick="runRep()">Dikhao</button></div><div id="out"></div>`;
-  if(inv.length)runRep();
-};
-async function runRep(){
-  const tx=await q('transactions','*',x=>{x=x.eq('investor_id',$('#ri').value).order('tx_date');if($('#rf').value)x=x.gte('tx_date',$('#rf').value);if($('#rt').value)x=x.lte('tx_date',$('#rt').value);return x});
-  cache.rep=tx;
-  $('#out').innerHTML=`<div class="noprint mb-3"><button class="b" onclick="csv()">⬇ CSV</button> <button class="b" onclick="print()">🖨 PDF / Print</button></div>
-  <div class="c"><h3 class="font-bold">Statement: ${esc($('#ri').selectedOptions[0]?.text)} (${$('#rf').value||'start'} → ${$('#rt').value})</h3>
-  <div style="overflow-x:auto"><table class="w-full text-sm mt-2"><tr class="text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Ref</th></tr>
-  ${tx.map(t=>`<tr class="border-t"><td class="py-2">${t.tx_date}</td><td>${t.type}</td><td>${fmt(t.amount)} ${esc(t.currency)}</td><td>${esc(t.reference)}</td></tr>`).join('')}</table></div></div>`;
-}
-function csv(){
-  const rows=[['Date','Type','Amount','Currency','Method','Reference','Notes'],...cache.rep.map(t=>[t.tx_date,t.type,t.amount,t.currency,t.method,t.reference,t.notes])];
-  const s=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='statement.csv';a.click();
-}
+pages.rep=async()=>{await load();$('#main').innerHTML=`<h1>Statement</h1><div class="card np"><div class="fg"><label>Investor<select id="ri" onchange="runRep()">${D.inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label><label>From<input id="rf" type="date"></label><label>To<input id="rt" type="date" value="${today()}"></label></div><button class="btn" onclick="runRep()">Show</button><button class="btn o" onclick="csv()">Download CSV</button><button class="btn o" onclick="print()">Print / PDF</button></div><div id="out"></div>`;runRep()};
+function runRep(){const i=$('#ri').value,f=$('#rf').value,t=$('#rt').value,A=D.acc.filter(a=>a.investor_id===i),no=Object.fromEntries(A.map(a=>[a.id,a.account_no]));
+ RP=D.tx.filter(x=>x.investor_id===i&&(!f||x.tx_date>=f)&&(!t||x.tx_date<=t)).reverse().map(x=>({...x,no:no[x.account_id]}));
+ $('#out').innerHTML=`<div class="card ov"><b>${esc(D.nm[i])}</b><table><tr><th>Account</th><th class="n">Invested</th><th class="n">Withdrawn</th><th class="n">Profit / loss</th></tr>${A.map(a=>{const x=st(a);return`<tr><td>${esc(a.account_no)}</td><td class="n">${fmt(x.inv)}</td><td class="n">${fmt(x.wd)}</td><td class="n">${sg(x.pr)}</td></tr>`}).join('')}</table></div>
+ <div class="card ov"><table><tr><th>Date</th><th>Account</th><th>Type</th><th class="n">Amount</th><th>Reference</th></tr>${RP.map(x=>`<tr><td>${x.tx_date}</td><td>${esc(x.no)}</td><td>${esc(x.type.replace('_',' '))}</td><td class="n">${fmt(x.amount)} ${esc(x.currency)}</td><td class="mu">${esc(x.reference)}</td></tr>`).join('')}</table></div>`}
+function csv(){const s=[['Date','Account','Type','Amount','Currency','Reference','Notes'],...RP.map(t=>[t.tx_date,t.no,t.type,t.amount,t.currency,t.reference,t.notes])].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='statement.csv';a.click()}
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 start();
