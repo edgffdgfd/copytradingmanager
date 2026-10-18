@@ -2,21 +2,44 @@
 <html lang="hi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Copy Trading Manager</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5">
 <link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>tailwind.config={darkMode:'class'}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <style>
-.c{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 3px #0002}
-.dark .c{background:#1e293b}
-input,select,textarea{width:100%;border:1px solid #94a3b8;border-radius:8px;padding:8px;background:transparent;color:inherit;margin-top:4px}
+:root{--bg:#EEF1FF;--card:#fff;--ink:#1E1B4B;--mut:#6B7280;--sh1:#fff;--sh2:rgba(79,70,229,.2)}
+.dark{--bg:#14122B;--card:#221F45;--ink:#F1F0FF;--mut:#A5A3C9;--sh1:rgba(255,255,255,.05);--sh2:rgba(0,0,0,.55)}
+html body{background:var(--bg);color:var(--ink);font-family:'Baloo 2',system-ui,-apple-system,sans-serif;font-size:16px;padding-bottom:100px}
+.c{background:var(--card);border-radius:22px;padding:16px;box-shadow:8px 8px 18px var(--sh2),-6px -6px 14px var(--sh1)}
+.c>b:first-child{font-size:18px}
+input,select,textarea{width:100%;border:2px solid transparent;border-radius:14px;padding:12px;font-size:16px;background:var(--bg);color:inherit;margin-top:4px;box-shadow:inset 3px 3px 7px var(--sh2),inset -3px -3px 7px var(--sh1)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#6366F1}
 select option{color:#000}
-button.b{background:#2563eb;color:#fff;border-radius:8px;padding:8px 14px}
-label{font-size:13px;display:block;margin-top:8px}
-@media print{nav,header,.noprint{display:none!important}}
+label{font-size:14px;font-weight:700;display:block;margin-top:12px;color:var(--mut)}
+button.b{background:linear-gradient(180deg,#818CF8,#4F46E5);color:#fff;border-radius:16px;padding:12px 22px;min-height:48px;font-weight:700;font-size:16px;box-shadow:0 5px 0 #3730A3,0 10px 16px rgba(79,70,229,.35);margin-bottom:6px}
+button.b:active{transform:translateY(4px);box-shadow:0 1px 0 #3730A3}
+button.b2{background:var(--bg);color:#4F46E5;border-radius:14px;padding:8px 16px;font-weight:700;font-size:14px;margin-top:10px;box-shadow:3px 3px 8px var(--sh2),-3px -3px 8px var(--sh1)}
+.hd{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;color:#fff;background:linear-gradient(120deg,#4F46E5,#7C3AED 60%,#DB2777);border-radius:0 0 26px 26px;box-shadow:0 8px 20px rgba(79,70,229,.35)}
+.hd .ic{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);font-size:18px}
+.hd .lo{background:rgba(255,255,255,.22);border-radius:999px;padding:8px 16px;font-weight:700;margin-left:8px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:4px;padding:8px;background:var(--card);border-radius:26px 26px 0 0;box-shadow:0 -8px 24px var(--sh2);z-index:20;overflow-x:auto}
+nav button{flex:1;min-width:66px;padding:6px 4px;border-radius:18px;font-size:12px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center}
+nav i{font-style:normal;font-size:22px;line-height:1.2}
+nav button.on{background:linear-gradient(180deg,#818CF8,#4F46E5);color:#fff;box-shadow:0 4px 0 #3730A3}
+.tile{border-radius:22px;padding:14px;color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 6px 0 rgba(0,0,0,.2),0 14px 20px rgba(0,0,0,.15);margin-bottom:6px}
+.tile small{display:block;font-size:13px;opacity:.9;font-weight:500}.tile b{font-size:22px;line-height:1.2}.tile span{font-size:24px;float:right}
+.t1{background:linear-gradient(135deg,#818CF8,#4F46E5)}.t2{background:linear-gradient(135deg,#2DD4BF,#0D9488)}.t3{background:linear-gradient(135deg,#60A5FA,#2563EB)}.t4{background:linear-gradient(135deg,#4ADE80,#16A34A)}
+.t5{background:linear-gradient(135deg,#FBBF24,#EA580C)}.t6{background:linear-gradient(135deg,#C084FC,#7E22CE)}.t7{background:linear-gradient(135deg,#F472B6,#DB2777)}.t8{background:linear-gradient(135deg,#22D3EE,#0E7490)}
+.mini{background:var(--bg);border-radius:14px;padding:8px 10px;box-shadow:inset 2px 2px 5px var(--sh2),inset -2px -2px 5px var(--sh1)}
+.mini small{display:block;font-size:12px;color:var(--mut)}.mini b{font-size:16px}
+.bd{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#fff}
+.bd-deposit{background:#10B981}.bd-withdrawal{background:#F59E0B}.bd-profit_share{background:#6366F1}.bd-profit_payout{background:#EC4899}
+h3.st{font-size:18px;font-weight:700;margin:20px 0 10px}
+@media print{nav,header,.noprint{display:none!important}html body{background:#fff!important;color:#000!important}.c{box-shadow:none!important}}
 </style></head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen pb-20">
+<body class="min-h-screen">
 <div id="app"></div>
 <div id="zoom" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onclick="this.classList.add('hidden')"><img id="zimg" class="max-h-full max-w-full"></div>
 <script>
@@ -33,16 +56,21 @@ let me,cache={};
 const pages={};
 const TABS=[['dash','🏠 Home'],['inv','👤 Investors'],['acc','🏦 Accounts'],['tx','💸 Ledger'],['pl','📈 Daily P/L'],['rep','📄 Report']];
 
+// ---- logo (bhi alag file logo.svg me hai) ----
+const LOGO=s=>`<svg width="${s}" height="${s}" viewBox="0 0 96 96" style="filter:drop-shadow(0 5px 6px rgba(0,0,0,.3))"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366F1"/><stop offset=".55" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs><rect width="96" height="96" rx="24" fill="url(#lg)"/><rect x="3" y="3" width="90" height="44" rx="21" fill="#fff" opacity=".14"/><g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M26 46v-4M26 78v-4M48 34v-4M48 78v-4M70 22v-4M70 78v-4"/></g><rect x="19" y="46" width="14" height="28" rx="5" fill="#FDE68A"/><rect x="41" y="34" width="14" height="40" rx="5" fill="#6EE7B7"/><rect x="63" y="22" width="14" height="52" rx="5" fill="#fff"/><path d="M14 52L38 38l12 6 28-22" fill="none" stroke="#FBBF24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M66 20h14v14" fill="none" stroke="#FBBF24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
 // ---- light/dark mode ----
 if(localStorage.theme==='dark')document.documentElement.classList.add('dark');
 function toggleTheme(){localStorage.theme=document.documentElement.classList.toggle('dark')?'dark':'light'}
 
 // ---- data helper: table se rows lao ----
 async function q(t,sel='*',f=x=>x){const{data,error}=await f(sb.from(t).select(sel));if(error)alert(error.message);return data||[]}
-const card=(l,v)=>`<div class="c"><div class="text-xs opacity-70">${l}</div><div class="text-lg font-bold">${v}</div></div>`;
+const card=(l,v,c,i)=>`<div class="tile ${c}"><span>${i}</span><small>${l}</small><b>${v}</b></div>`;
+const mini=(l,v,c='')=>`<div class="mini"><small>${l}</small><b class="${c}">${v}</b></div>`;
 
 // ================= LOGIN =================
-function loginView(){$('#app').innerHTML=`<div class="max-w-sm mx-auto p-6 pt-20"><h1 class="text-2xl font-bold mb-4">📊 Copy Trading Manager</h1><div class="c">
+function loginView(){$('#app').innerHTML=`<div class="max-w-sm mx-auto p-6 pt-12 text-center"><div class="flex justify-center">${LOGO(96)}</div>
+<h1 class="text-3xl font-bold mt-3">Copy Trading Manager</h1><p class="mb-6" style="color:var(--mut)">Investors ka hisaab, saaf aur simple</p><div class="c text-left">
 <label>Email<input id="em" type="email"></label><label>Password<input id="pw" type="password"></label>
 <button class="b mt-4 w-full" onclick="login()">Login</button>
 <button class="mt-3 text-sm underline" onclick="signup()">Pehli baar? Account banao</button><p id="msg" class="text-red-500 text-sm mt-2"></p></div></div>`}
@@ -55,12 +83,12 @@ async function start(){
   const{data:p}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
   me={id:session.user.id,admin:p?.role==='admin'};
   const tabs=me.admin?TABS:TABS.filter(t=>['dash','acc','tx','rep'].includes(t[0]));
-  $('#app').innerHTML=`<header class="flex justify-between items-center p-3 bg-slate-900 text-white"><b>📊 Copy Trading</b><span><button onclick="toggleTheme()">🌓</button> <button class="ml-3 text-sm" onclick="sb.auth.signOut().then(start)">Logout</button></span></header>
-  <main id="main" class="p-3 max-w-4xl mx-auto"></main>
-  <nav class="fixed bottom-0 inset-x-0 flex overflow-x-auto bg-white dark:bg-slate-800 border-t">${tabs.map(([k,l])=>`<button class="flex-1 min-w-[80px] py-3 text-xs" onclick="go('${k}')">${l}</button>`).join('')}</nav>`;
+  $('#app').innerHTML=`<header class="hd"><span class="flex items-center gap-2 text-lg font-bold">${LOGO(38)} Copy Trading</span><span class="flex items-center"><button class="ic" onclick="toggleTheme()">🌓</button><button class="lo" onclick="sb.auth.signOut().then(start)">Logout</button></span></header>
+  <main id="main" class="p-3 pt-5 max-w-4xl mx-auto"></main>
+  <nav>${tabs.map(([k,l])=>{const[e,...t]=l.split(' ');return `<button data-k="${k}" onclick="go('${k}')"><i>${e}</i>${t.join(' ')}</button>`}).join('')}</nav>`;
   go('dash');
 }
-async function go(k){$('#main').innerHTML='Loading...';await pages[k]()}
+async function go(k){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));$('#main').innerHTML='<p class="text-center" style="color:var(--mut)">Loading...</p>';await pages[k]();scrollTo(0,0)}
 
 // ================= DASHBOARD =================
 pages.dash=async()=>{
@@ -69,25 +97,24 @@ pages.dash=async()=>{
   const tp=pl.filter(r=>r.pdate===t).reduce((a,r)=>a+Number(r.amount),0);
   const mp=pl.filter(r=>r.pdate.startsWith(m)).reduce((a,r)=>a+Number(r.amount),0);
   const pend=s.filter(r=>r.profit_pending>0);
-  $('#main').innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-  ${card('Investors',s.length)}${card('Accounts',acc.length)}${card('Total Invested',fmt(sum('invested')))}${card('Total Profit',fmt(sum('profit_earned')))}
-  ${card('Withdrawn',fmt(sum('withdrawn')))}${card('Remaining',fmt(sum('remaining')))}${card('Aaj ka Profit',fmt(tp))}${card('Is Mahine',fmt(mp))}</div>
-  <h3 class="font-bold mt-4 mb-2">⚠️ Pending Profit Payout</h3>
-  ${pend.map(r=>`<div class="c mb-2 flex justify-between"><span>${esc(r.name)}</span><b>${fmt(r.profit_pending)}</b></div>`).join('')||'<p class="text-sm opacity-70">Koi pending nahi ✅</p>'}`;
+  $('#main').innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+  ${card('Investors',s.length,'t1','👥')}${card('Accounts',acc.length,'t2','🏦')}${card('Total Invested',fmt(sum('invested')),'t3','💰')}${card('Total Profit',fmt(sum('profit_earned')),'t4','📈')}
+  ${card('Withdrawn',fmt(sum('withdrawn')),'t5','💸')}${card('Remaining',fmt(sum('remaining')),'t6','🪙')}${card('Aaj ka Profit',fmt(tp),'t7','☀️')}${card('Is Mahine',fmt(mp),'t8','📅')}</div>
+  <h3 class="st">⚠️ Pending Profit Payout</h3>
+  ${pend.map(r=>`<div class="c mb-3 flex justify-between items-center"><span>${esc(r.name)}</span><span class="bd bd-profit_payout" style="font-size:15px">${fmt(r.profit_pending)}</span></div>`).join('')||'<div class="c text-center">Koi pending nahi ✅</div>'}`;
 };
 
 // ================= INVESTORS =================
 pages.inv=async()=>{
   const s=await q('investor_summary');
-  $('#main').innerHTML=`<div class="c mb-3"><b>Naya Investor</b>
+  $('#main').innerHTML=`<div class="c mb-4"><b>➕ Naya Investor</b>
   <label>Naam<input id="n"></label><label>Phone<input id="p"></label>
   <label>Email (isi email se investor login karega)<input id="e" type="email"></label>
   <label>Investor ka profit hissa % (jaise 70)<input id="s" type="number" value="100"></label>
-  <label>Notes / Address<textarea id="no"></textarea></label><button class="b mt-3" onclick="addInv()">Save</button></div>`
-  +s.map(r=>`<div class="c mb-2"><b>${esc(r.code)} · ${esc(r.name)}</b> <small>(${r.status})</small>
-  <div class="text-sm grid grid-cols-2 gap-1 mt-1"><span>Invested: ${fmt(r.invested)}</span><span>Withdrawn: ${fmt(r.withdrawn)}</span>
-  <span>Profit: ${fmt(r.profit_earned)}</span><span>Paid: ${fmt(r.profit_paid)}</span><span>Pending: ${fmt(r.profit_pending)}</span>
-  <span>Remaining: ${fmt(r.remaining)}</span><span>ROI: ${r.roi_pct}%</span><span>Share: ${r.share_pct}%</span></div></div>`).join('');
+  <label>Notes / Address<textarea id="no"></textarea></label><button class="b mt-4" onclick="addInv()">Save</button></div>`
+  +s.map(r=>`<div class="c mb-4"><div class="flex justify-between items-center"><b class="text-lg">${esc(r.code)} · ${esc(r.name)}</b><span class="bd bd-profit_share">${esc(r.status)}</span></div>
+  <div class="grid grid-cols-2 gap-2 mt-3">${mini('Invested',fmt(r.invested))}${mini('Withdrawn',fmt(r.withdrawn))}${mini('Profit',fmt(r.profit_earned),'text-green-600')}${mini('Paid',fmt(r.profit_paid))}
+  ${mini('Pending',fmt(r.profit_pending),'text-red-500')}${mini('Remaining',fmt(r.remaining))}${mini('ROI',r.roi_pct+'%')}${mini('Share',r.share_pct+'%')}</div></div>`).join('');
 };
 async function addInv(){
   if(!$('#n').value.trim())return alert('Naam daalo');
@@ -99,17 +126,17 @@ async function addInv(){
 pages.acc=async()=>{
   const inv=await q('investors','id,name'),a=await q('accounts','*,investors(name)');cache.acc=a;
   const opt=inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
-  $('#main').innerHTML=(me.admin?`<div class="c mb-3"><b>Naya Trading Account</b>
+  $('#main').innerHTML=(me.admin?`<div class="c mb-4"><b>➕ Naya Trading Account</b>
   <label>Investor<select id="ai">${opt}</select></label><label>Account Number<input id="an"></label>
   <label>Broker<input id="ab"></label><label>Platform<select id="ap"><option>MT4</option><option>MT5</option><option>Other</option></select></label>
   <label>Account Type<input id="at" placeholder="Standard / Cent / PAMM"></label>
   <label>Starting Balance<input id="asb" type="number"></label><label>Start Date<input id="asd" type="date" value="${today()}"></label>
-  <button class="b mt-3" onclick="addAcc()">Save</button></div>`:'')
+  <button class="b mt-4" onclick="addAcc()">Save</button></div>`:'')
   +a.map(r=>{const net=r.current_balance-r.start_balance,pc=r.start_balance>0?net/r.start_balance*100:0;
-  return `<div class="c mb-2"><b>${esc(r.account_no)}</b> · ${esc(r.investors?.name)} <small>${esc(r.broker)} ${esc(r.platform)}</small>
-  <div class="text-sm grid grid-cols-2 gap-1 mt-1"><span>Start: ${fmt(r.start_balance)}</span><span>Ab: <b>${fmt(r.current_balance)}</b></span>
-  <span class="${net>=0?'text-green-500':'text-red-500'}">Growth: ${fmt(net)} (${pc.toFixed(2)}%)</span><span>Start date: ${r.start_date}</span></div>
-  ${me.admin?`<button class="text-sm underline mt-2" onclick="updBal('${r.id}')">Current balance update</button>`:''}</div>`}).join('');
+  return `<div class="c mb-4"><b class="text-lg">${esc(r.account_no)}</b> · ${esc(r.investors?.name)} <small style="color:var(--mut)">${esc(r.broker)} ${esc(r.platform)}</small>
+  <div class="grid grid-cols-2 gap-2 mt-3">${mini('Start',fmt(r.start_balance))}${mini('Ab',fmt(r.current_balance))}
+  ${mini('Growth',fmt(net)+' ('+pc.toFixed(2)+'%)',net>=0?'text-green-600':'text-red-500')}${mini('Start date',r.start_date)}</div>
+  ${me.admin?`<button class="b2" onclick="updBal('${r.id}')">✏️ Current balance update</button>`:''}</div>`}).join('');
 };
 async function addAcc(){
   const sb0=Number($('#asb').value)||0;
@@ -130,18 +157,18 @@ pages.tx=async()=>{
   const tx=await q('transactions','*,investors(name)',x=>x.order('tx_date',{ascending:false}).limit(100));cache.tx=tx;
   const paths=tx.flatMap(t=>t.proofs||[]);let urls={};
   if(paths.length){const{data}=await sb.storage.from('proofs').createSignedUrls(paths,3600);(data||[]).forEach(d=>urls[d.path]=d.signedUrl)}
-  $('#main').innerHTML=(me.admin?`<div class="c mb-3"><b>Nayi Entry</b>
+  $('#main').innerHTML=(me.admin?`<div class="c mb-4"><b>➕ Nayi Entry</b>
   <label>Account<select id="ta">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
   <label>Type<select id="tt"><option value="deposit">Deposit (investor ne diya)</option><option value="withdrawal">Withdrawal (investor ko wapas)</option><option value="profit_share">Profit Share</option><option value="profit_payout">Profit Payout (profit bheja)</option></select></label>
   <label>Amount<input id="tm" type="number" step="any"></label><label>Currency<input id="tc" value="USD"></label>
   <label>Date<input id="td" type="date" value="${today()}"></label><label>Payment Method<input id="tp"></label>
   <label>Reference / Txn ID<input id="tr"></label><label>Notes<input id="tn"></label>
   <label>Proof screenshot (camera ya gallery)<input id="tf" type="file" accept="image/*" multiple></label>
-  <button class="b mt-3" onclick="addTx()">Save Entry</button></div>`:'')
-  +tx.map(t=>`<div class="c mb-2"><div class="flex justify-between"><b>${esc(t.investors?.name)}</b><b class="${t.amount<0?'text-red-500':''}">${fmt(t.amount)} ${esc(t.currency)}</b></div>
-  <div class="text-xs opacity-70">${t.tx_date} · ${t.type} · ${esc(t.method)} ${esc(t.reference)} ${esc(t.notes)}</div>
-  <div class="flex gap-2 mt-1 flex-wrap">${(t.proofs||[]).map(p=>urls[p]?`<img src="${urls[p]}" class="w-14 h-14 object-cover rounded" onclick="zoom('${urls[p]}')">`:'').join('')}</div>
-  ${me.admin&&t.amount>0?`<button class="text-xs underline mt-1" onclick="reverseTx('${t.id}')">↩ Reverse (galti sudharo)</button>`:''}</div>`).join('');
+  <button class="b mt-4" onclick="addTx()">Save Entry</button></div>`:'')
+  +tx.map(t=>`<div class="c mb-3"><div class="flex justify-between items-center"><b>${esc(t.investors?.name)}</b><b class="text-lg ${t.amount<0?'text-red-500':'text-green-600'}">${fmt(t.amount)} ${esc(t.currency)}</b></div>
+  <div class="mt-1"><span class="bd bd-${esc(t.type)}">${esc(t.type)}</span> <span class="text-xs" style="color:var(--mut)">${t.tx_date} · ${esc(t.method)} ${esc(t.reference)} ${esc(t.notes)}</span></div>
+  <div class="flex gap-2 mt-2 flex-wrap">${(t.proofs||[]).map(p=>urls[p]?`<img src="${urls[p]}" class="w-16 h-16 object-cover rounded-xl" onclick="zoom('${urls[p]}')">`:'').join('')}</div>
+  ${me.admin&&t.amount>0?`<button class="b2" onclick="reverseTx('${t.id}')">↩ Reverse (galti sudharo)</button>`:''}</div>`).join('');
 };
 async function addTx(){
   const f=id=>$('#'+id).value,a=cache.acc.find(x=>x.id===f('ta'));
@@ -167,14 +194,14 @@ pages.pl=async()=>{
   const a=await q('accounts','id,account_no,investors(name)'),d=await q('daily_profit','*',x=>x.order('pdate',{ascending:false}));
   const mon={};d.forEach(r=>{const m=r.pdate.slice(0,7);mon[m]=(mon[m]||0)+Number(r.amount)});
   const mx=Math.max(1,...Object.values(mon).map(Math.abs));
-  $('#main').innerHTML=`<div class="c mb-3"><b>Daily Profit / Loss (loss ke liye minus likho)</b>
+  $('#main').innerHTML=`<div class="c mb-4"><b>➕ Daily Profit / Loss</b><div class="text-sm" style="color:var(--mut)">Loss ke liye minus likho</div>
   <label>Account<select id="pa">${a.map(x=>`<option value="${x.id}">${esc(x.investors?.name)} · ${esc(x.account_no)}</option>`).join('')}</select></label>
   <label>Date<input id="pd" type="date" value="${today()}"></label><label>Amount<input id="pm" type="number" step="any"></label>
-  <button class="b mt-3" onclick="addPl()">Save</button></div>
-  <h3 class="font-bold mb-2">Monthly Summary</h3>
-  ${Object.entries(mon).sort().reverse().map(([m,v])=>`<div class="c mb-1 text-sm"><div class="flex justify-between"><span>${m}</span><b>${fmt(v)}</b></div><div style="height:6px;border-radius:3px;width:${Math.abs(v)/mx*100}%;background:${v>=0?'#22c55e':'#ef4444'}"></div></div>`).join('')}
-  <h3 class="font-bold mt-4 mb-2">Recent Daily</h3>
-  ${d.slice(0,30).map(r=>`<div class="c mb-1 text-sm flex justify-between"><span>${r.pdate}</span><b class="${r.amount<0?'text-red-500':'text-green-500'}">${fmt(r.amount)}</b></div>`).join('')}`;
+  <button class="b mt-4" onclick="addPl()">Save</button></div>
+  <h3 class="st">📅 Monthly Summary</h3>
+  ${Object.entries(mon).sort().reverse().map(([m,v])=>`<div class="c mb-3"><div class="flex justify-between"><span>${m}</span><b class="${v>=0?'text-green-600':'text-red-500'}">${fmt(v)}</b></div><div style="height:10px;border-radius:6px;margin-top:6px;width:${Math.abs(v)/mx*100}%;background:${v>=0?'linear-gradient(90deg,#4ADE80,#16A34A)':'linear-gradient(90deg,#FB7185,#DC2626)'}"></div></div>`).join('')}
+  <h3 class="st">🗓 Recent Daily</h3>
+  ${d.slice(0,30).map(r=>`<div class="c mb-2 flex justify-between"><span>${r.pdate}</span><b class="${r.amount<0?'text-red-500':'text-green-600'}">${fmt(r.amount)}</b></div>`).join('')}`;
 };
 async function addPl(){
   const v=Number($('#pm').value);if(!$('#pm').value)return alert('Amount daalo');
@@ -185,18 +212,18 @@ async function addPl(){
 // ================= REPORT (CSV + PDF) =================
 pages.rep=async()=>{
   const inv=await q('investors','id,name');
-  $('#main').innerHTML=`<div class="c mb-3 noprint"><label>Investor<select id="ri">${inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label>
+  $('#main').innerHTML=`<div class="c mb-4 noprint"><label>Investor<select id="ri">${inv.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></label>
   <label>From<input id="rf" type="date"></label><label>To<input id="rt" type="date" value="${today()}"></label>
-  <button class="b mt-3" onclick="runRep()">Dikhao</button></div><div id="out"></div>`;
+  <button class="b mt-4" onclick="runRep()">Dikhao</button></div><div id="out"></div>`;
   if(inv.length)runRep();
 };
 async function runRep(){
   const tx=await q('transactions','*',x=>{x=x.eq('investor_id',$('#ri').value).order('tx_date');if($('#rf').value)x=x.gte('tx_date',$('#rf').value);if($('#rt').value)x=x.lte('tx_date',$('#rt').value);return x});
   cache.rep=tx;
-  $('#out').innerHTML=`<div class="noprint mb-2"><button class="b" onclick="csv()">⬇ CSV</button> <button class="b" onclick="print()">🖨 PDF / Print</button></div>
-  <h3 class="font-bold">Statement: ${esc($('#ri').selectedOptions[0]?.text)} (${$('#rf').value||'start'} → ${$('#rt').value})</h3>
-  <table class="w-full text-sm mt-2"><tr class="text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Ref</th></tr>
-  ${tx.map(t=>`<tr class="border-t"><td>${t.tx_date}</td><td>${t.type}</td><td>${fmt(t.amount)} ${esc(t.currency)}</td><td>${esc(t.reference)}</td></tr>`).join('')}</table>`;
+  $('#out').innerHTML=`<div class="noprint mb-3"><button class="b" onclick="csv()">⬇ CSV</button> <button class="b" onclick="print()">🖨 PDF / Print</button></div>
+  <div class="c"><h3 class="font-bold">Statement: ${esc($('#ri').selectedOptions[0]?.text)} (${$('#rf').value||'start'} → ${$('#rt').value})</h3>
+  <div style="overflow-x:auto"><table class="w-full text-sm mt-2"><tr class="text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Ref</th></tr>
+  ${tx.map(t=>`<tr class="border-t"><td class="py-2">${t.tx_date}</td><td>${t.type}</td><td>${fmt(t.amount)} ${esc(t.currency)}</td><td>${esc(t.reference)}</td></tr>`).join('')}</table></div></div>`;
 }
 function csv(){
   const rows=[['Date','Type','Amount','Currency','Method','Reference','Notes'],...cache.rep.map(t=>[t.tx_date,t.type,t.amount,t.currency,t.method,t.reference,t.notes])];
