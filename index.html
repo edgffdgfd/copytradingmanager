@@ -108,7 +108,7 @@ pages.dash=async()=>{
 // ================= ACCESS (admin: kis login ko kaun sa account dikhe) =================
 pages.acx=async()=>{
   const{data:lg,error}=await sb.rpc('admin_list_logins');if(error)alert(error.message);
-  const a=await q('accounts','id,account_no,investors(name)'),ac=await q('account_access');
+  let a=await q('accounts','id,account_no,investors(name)'),ac=await q('account_access');a=[...new Map(a.map(x=>[x.id,x])).values()];
   const users=(lg||[]).filter(u=>u.role!=='admin');
   $('#main').innerHTML=`<div class="c mb-4"><b>🔑 Access dena</b><div class="text-sm" style="color:var(--mut)">Jis account par ✅ lagega, sirf wahi us login ko dikhega. Admin ko sab dikhta hai.</div></div>`
   +(users.map(u=>`<div class="c mb-4"><b class="text-lg">${esc(u.email)}</b>
