@@ -2,11 +2,11 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Copy Trading</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#16324F"><link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <style>
-:root{--bg:#F3F5F4;--ink:#12201F;--mu:#5F6F6D;--ln:#DCE4E2;--br:#16324F;--pos:#0E7A52;--neg:#C0392B}
+:root{--bg:#EEF2F9;--ink:#1B2437;--mu:#6B7488;--ln:#E1E7F2;--br:#4F46E5;--br2:#7C6CF5;--pos:#0E9F6E;--neg:#E0443E;--sh:0 1px 2px rgba(30,41,90,.06),0 8px 22px rgba(30,41,90,.09);--sh2:0 2px 4px rgba(30,41,90,.08),0 14px 30px rgba(30,41,90,.14)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'IBM Plex Sans',system-ui,sans-serif;font-variant-numeric:tabular-nums}
 header{background:var(--br);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}header b{font-size:17px;font-weight:600}
 nav{background:#fff;border-bottom:1px solid var(--ln);display:flex;gap:4px;padding:0 12px;overflow-x:auto}
@@ -25,19 +25,54 @@ input,select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--ln)
 label{font-size:13px;color:var(--mu);display:block}.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}
 h1{font-size:24px;margin:0 0 4px;font-weight:600}h2{font-size:18px;margin:24px 0 10px;font-weight:600}
 .ch{width:100%;height:110px}.ov{overflow-x:auto}
+
+body{background:linear-gradient(160deg,#EEF2F9 0%,#E6ECFA 100%) fixed}
+header{background:linear-gradient(135deg,var(--br),var(--br2));box-shadow:0 4px 16px rgba(79,70,229,.35);position:sticky;top:0;z-index:5}
+nav{box-shadow:0 2px 10px rgba(30,41,90,.06);border-bottom:0;position:sticky;top:48px;z-index:4}
+nav button.on{background:linear-gradient(180deg,#fff,#EEF0FF);border-radius:8px 8px 0 0}
+.btn{background:linear-gradient(180deg,var(--br2),var(--br));box-shadow:0 4px 10px rgba(79,70,229,.35),inset 0 1px 0 rgba(255,255,255,.25);border-radius:10px;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 7px 16px rgba(79,70,229,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn:active{transform:translateY(1px);box-shadow:0 2px 5px rgba(79,70,229,.3)}
+.btn.o{background:linear-gradient(180deg,#fff,#F3F5FC);box-shadow:var(--sh);color:var(--br)}
+.card{background:linear-gradient(180deg,#fff,#FBFCFF);border:1px solid #fff;border-radius:14px;box-shadow:var(--sh)}
+.kp div{background:linear-gradient(180deg,#fff,#F6F8FE);border:1px solid #fff;border-radius:14px;box-shadow:var(--sh);transition:transform .15s,box-shadow .15s}
+.kp div:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+input,select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--ln);border-radius:10px;background:#fff;margin:4px 0 10px;box-shadow:inset 0 2px 4px rgba(30,41,90,.06)}
+textarea{min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid #C7C2FB;border-color:var(--br2)}
+tr.go:hover{background:#F1F3FF}
+.bar i{background:linear-gradient(90deg,var(--br2),var(--br))}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#EEF0FF;color:var(--br)}
+.tag.buy,.tag.win{background:#DDF6EC;color:var(--pos)}.tag.sell,.tag.loss{background:#FDE5E3;color:var(--neg)}.tag.be{background:#EEF0F6;color:var(--mu)}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin:8px 0}
+.shots img{width:100%;height:90px;object-fit:cover;border-radius:10px;box-shadow:var(--sh);cursor:pointer;transition:transform .15s}
+.shots img:hover{transform:scale(1.04)}
+.pv{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 10px}.pv img{width:64px;height:64px;object-fit:cover;border-radius:8px;box-shadow:var(--sh)}
+.exp{border-left:4px solid var(--br2)}
+.row2{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+#lb{position:fixed;inset:0;background:rgba(15,20,40,.85);display:none;align-items:center;justify-content:center;z-index:50}#lb img{max-width:94vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px #000}
 @media print{header,nav,.np{display:none}}
 </style></head>
-<body><div id="app"></div>
+<body><div id="app"></div><div id="lb" onclick="this.style.display='none'"><img id="lbi"></div>
 <script>
 const sb=supabase.createClient('https://clxkaxvpqndzmzkhgabt.supabase.co','sb_publishable_5N8TARUQX88KmWsACvfhvg_5gARI8gx');
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}),today=()=>new Date().toISOString().slice(0,10);
 const sg=n=>`<b class="${n<0?'neg':'pos'}">${n>0?'+':''}${fmt(n)}</b>`,sum=(a,f)=>a.reduce((s,r)=>s+Number(f(r)||0),0);
 let me,D={},RP=[];const pages={};
+// ===== NEW: shared helpers (photos, lightbox) =====
+function zoom(u){$('#lbi').src=u;$('#lb').style.display='flex'}
+async function upPhotos(files,folder,bucket='proofs'){const ps=[];for(const file of files){const p=`${folder}/${crypto.randomUUID()}.jpg`,{error}=await sb.storage.from(bucket).upload(p,await compress(file),{contentType:'image/jpeg'});if(error){alert(error.message);return null}ps.push(p)}return ps}
+async function signed(paths){const m={};if(paths.length){const{data}=await sb.storage.from('proofs').createSignedUrls(paths,3600);(data||[]).forEach(d=>m[d.path]=d.signedUrl)}return m}
+function prevPhotos(inp,box){const b=$('#'+box);b.innerHTML='';[...$('#'+inp).files].forEach(f=>{const i=document.createElement('img');i.src=URL.createObjectURL(f);b.appendChild(i)})}
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
 async function q(t,sel='*',f=x=>x){const{data,error}=await f(sb.from(t).select(sel));if(error)alert(error.message);return data||[]}
 async function load(){const[i,a,t,p]=await Promise.all([q('investors','id,name,code'),q('accounts'),q('transactions','*',x=>x.order('tx_date',{ascending:false})),q('daily_profit','*',x=>x.order('pdate',{ascending:false}))]);
  const accU=[...new Map(a.map(r=>[r.id,r])).values()];
- D={inv:i,nm:Object.fromEntries(i.map(r=>[r.id,r.name])),acc:accU,tx:t,pl:p}}
+ const [bk,bt,ex,sp,jt,ss]=await Promise.all([qs('bank_accounts'),qs('bank_txns','*',x=>x.order('tx_date',{ascending:false})),qs('expenses','*',x=>x.order('exp_date',{ascending:false})),qs('setups','*',x=>x.order('name')),qs('journal_trades','*',x=>x.order('trade_date',{ascending:false})),qs('trade_shots')]);
+ D={inv:i,nm:Object.fromEntries(i.map(r=>[r.id,r.name])),acc:accU,tx:t,pl:p,bk,bt,ex,sp,jt,ss}}
+async function qs(t,sel='*',f=x=>x){const{data,error}=await f(sb.from(t).select(sel));if(error){console.warn(t,error.message);return[]}return data||[]}
 function st(a){const t=D.tx.filter(x=>x.account_id===a.id),p=D.pl.filter(x=>x.account_id===a.id),f=k=>sum(t.filter(x=>x.type===k),x=>x.amount),inv=f('deposit'),wd=f('withdrawal'),po=f('profit_payout'),paidOut=wd+po;
  return{t,p,inv,wd,po,paidOut,pr:sum(p,x=>x.amount),bal:Number(a.current_balance||0),left:inv-paidOut,ret:inv>0?paidOut/inv*100:0}}
 const agg=l=>{const s=l.map(st);return{inv:sum(s,x=>x.inv),wd:sum(s,x=>x.paidOut),pr:sum(s,x=>x.pr),bal:sum(s,x=>x.bal),left:sum(s,x=>x.left)}};
@@ -49,7 +84,7 @@ function loginView(){$('#app').innerHTML=`<div style="max-width:360px;margin:12v
 async function login(){const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});error?$('#msg').textContent=error.message:start()}
 async function start(){const{data:{session}}=await sb.auth.getSession();if(!session)return loginView();
  const{data:p}=await sb.from('profiles').select('role').eq('id',session.user.id).single();me={id:session.user.id,admin:p?.role==='admin'};
- const T=me.admin?[['dash','Overview'],['mg','Manage'],['acx','Access'],['rep','Statement']]:[['dash','Overview'],['rep','Statement']];
+ const T=me.admin?[['dash','Overview'],['bank','Banks'],['exp','Expenses'],['jr','Journal'],['setup','Setups'],['mg','Manage'],['acx','Access'],['rep','Statement']]:[['dash','Overview'],['rep','Statement']];
  $('#app').innerHTML=`<header><b>Copy Trading</b><span style="display:flex;align-items:center;gap:12px"><span style="color:#C9D3D1;font-size:13px">${me.admin?"Admin":"Investor"} · ${esc(session.user.email)}</span><button onclick="sb.auth.signOut().then(start)">Sign out</button></span></header><nav>${T.map(([k,l])=>`<button data-k="${k}" onclick="go('${k}')">${l}</button>`).join('')}</nav><main id="main"></main>`;go('dash')}
 async function go(k,a){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.k===(k==='ac'?'dash':k)));$('#main').innerHTML='<p class="mu">Loading…</p>';await pages[k](a);scrollTo(0,0)}
 
@@ -96,6 +131,81 @@ function runRep(){const i=$('#ri').value,f=$('#rf').value,t=$('#rt').value,A=D.a
  $('#out').innerHTML=`<div class="card ov"><b>${esc(D.nm[i])}</b><table><tr><th>Account</th><th class="n">Invested</th><th class="n">Paid out</th><th class="n">Profit / loss</th></tr>${A.map(a=>{const x=st(a);return`<tr><td>${esc(a.account_no)}</td><td class="n">${fmt(x.inv)}</td><td class="n">${fmt(x.paidOut)}</td><td class="n">${sg(x.pr)}</td></tr>`}).join('')}</table></div>
  <div class="card ov"><table><tr><th>Date</th><th>Account</th><th>Type</th><th class="n">Amount</th><th>Reference</th></tr>${RP.map(x=>`<tr><td>${x.tx_date}</td><td>${esc(x.no)}</td><td>${esc(x.type.replace('_',' '))}</td><td class="n">${fmt(x.amount)} ${esc(x.currency)}</td><td class="mu">${esc(x.reference)}</td></tr>`).join('')}</table></div>`}
 function csv(){const s=[['Date','Account','Type','Amount','Currency','Reference','Notes'],...RP.map(t=>[t.tx_date,t.no,t.type,t.amount,t.currency,t.reference,t.notes])].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='statement.csv';a.click()}
+
+
+// ================= NEW: BANKS =================
+const PURP={investment:'Investment',profit_withdraw:'Profit withdrawal',daily:'Daily use',other:'Other'};
+const bkBal=b=>{const t=D.bt.filter(x=>x.bank_id===b.id);return Number(b.opening_balance||0)+sum(t.filter(x=>x.kind==='in'),x=>x.amount)-sum(t.filter(x=>x.kind==='out'),x=>x.amount)};
+pages.bank=async()=>{await load();const B=D.bk,tot=sum(B,bkBal),byP={};B.forEach(b=>byP[b.purpose]=(byP[b.purpose]||0)+bkBal(b));
+ const urls=await signed(D.bt.flatMap(t=>t.proofs||[]));
+ $('#main').innerHTML=`<h1>Bank accounts</h1><p class="mu">Every bank, what it is used for, and its live balance.</p>
+ <div class="kp"><div><small>Total in all banks</small><b>${fmt(tot)}</b></div>${Object.entries(byP).map(([k,v])=>`<div><small>${PURP[k]||k}</small><b>${fmt(v)}</b></div>`).join('')}</div>
+ <h2>Your banks</h2><div class="card ov"><table><tr><th>Bank</th><th>Used for</th><th class="n">Opening</th><th class="n">In</th><th class="n">Out</th><th class="n">Balance</th><th class="np"></th></tr>${B.map(b=>{const t=D.bt.filter(x=>x.bank_id===b.id);return`<tr><td><b>${esc(b.name)}</b><br><span class="mu">${esc(b.acc_no)}</span></td><td><span class="tag">${PURP[b.purpose]||esc(b.purpose)}</span></td><td class="n">${fmt(b.opening_balance)}</td><td class="n pos">${fmt(sum(t.filter(x=>x.kind==='in'),x=>x.amount))}</td><td class="n neg">${fmt(sum(t.filter(x=>x.kind==='out'),x=>x.amount))}</td><td class="n"><b>${fmt(bkBal(b))}</b></td><td class="np"><button class="mu" onclick="editBank('${b.id}')">Edit</button> <button class="neg" onclick="delBank('${b.id}')">Delete</button></td></tr>`}).join('')||'<tr><td class="mu">No banks yet. Add one below.</td></tr>'}</table></div>
+ <h2>Add bank</h2><div class="card np"><div class="fg"><label>Bank name<input id="bn"></label><label>Account no. / nickname<input id="bno"></label><label>Used for<select id="bp">${Object.entries(PURP).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>Opening balance<input id="bo" type="number" step="any" value="0"></label></div><button class="btn" onclick="addBank()">Save bank</button></div>
+ <h2>Add money in / out</h2><div class="card np"><div class="fg"><label>Bank<select id="tb">${B.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></label><label>Money<select id="tk"><option value="in">In (came into bank)</option><option value="out">Out (left the bank)</option></select></label><label>Amount<input id="ta" type="number" step="any"></label><label>Date<input id="td" type="date" value="${today()}"></label><label>Reason / source<input id="tr"></label><label>Notes<input id="tn"></label></div><label>Proof photos (many allowed)<input id="tf" type="file" accept="image/*" multiple onchange="prevPhotos('tf','tpv')"></label><div class="pv" id="tpv"></div><button class="btn" onclick="addBT()">Save entry</button></div>
+ <h2>All bank entries</h2><div class="card ov"><table><tr><th>Date</th><th>Bank</th><th>Reason</th><th class="n">Amount</th><th>Proof</th><th class="np"></th></tr>${D.bt.map(t=>{const b=B.find(x=>x.id===t.bank_id);return`<tr><td>${t.tx_date}</td><td>${esc(b?.name)}</td><td class="mu">${esc(t.reason)} ${esc(t.notes)}</td><td class="n ${t.kind==='in'?'pos':'neg'}">${t.kind==='in'?'+':'-'}${fmt(t.amount)}</td><td>${(t.proofs||[]).map(p=>urls[p]?`<a href="#" onclick="zoom('${urls[p]}');return false">proof</a>`:'').join(' ')}</td><td class="np"><button class="mu" onclick="editBT('${t.id}')">Edit</button> <button class="neg" onclick="delBT('${t.id}')">Delete</button></td></tr>`}).join('')||'<tr><td class="mu">No entries yet.</td></tr>'}</table></div>`};
+async function addBank(){const n=$('#bn').value.trim();if(!n)return alert('Enter bank name');const{error}=await sb.from('bank_accounts').insert({name:n,acc_no:$('#bno').value,purpose:$('#bp').value,opening_balance:Number($('#bo').value)||0});error?alert(error.message):go('bank')}
+async function editBank(id){const b=D.bk.find(x=>x.id===id),n=prompt('Bank name',b.name);if(n===null)return;const a=prompt('Account no. / nickname',b.acc_no||'');if(a===null)return;const p=prompt('Used for: investment / profit_withdraw / daily / other',b.purpose);if(p===null)return;const o=prompt('Opening balance',b.opening_balance);if(o===null||isNaN(o))return;const{error}=await sb.from('bank_accounts').update({name:n,acc_no:a,purpose:p,opening_balance:Number(o)}).eq('id',id);error?alert(error.message):go('bank')}
+async function delBank(id){if(!confirm('Delete this bank and all its entries?'))return;const{error}=await sb.from('bank_accounts').delete().eq('id',id);error?alert(error.message):go('bank')}
+async function addBT(){const v=Number($('#ta').value);if(!v||!$('#tb').value)return alert('Choose bank and enter amount');const ps=await upPhotos($('#tf').files,'bank');if(!ps)return;const{error}=await sb.from('bank_txns').insert({bank_id:$('#tb').value,kind:$('#tk').value,amount:Math.abs(v),tx_date:$('#td').value,reason:$('#tr').value,notes:$('#tn').value,proofs:ps});error?alert(error.message):go('bank')}
+async function editBT(id){const t=D.bt.find(x=>x.id===id),a=prompt('Amount',t.amount);if(a===null||isNaN(a))return;const d=prompt('Date (YYYY-MM-DD)',t.tx_date);if(d===null)return;const r=prompt('Reason',t.reason||'');if(r===null)return;const n=prompt('Notes',t.notes||'');if(n===null)return;const{error}=await sb.from('bank_txns').update({amount:Math.abs(Number(a)),tx_date:d,reason:r,notes:n}).eq('id',id);error?alert(error.message):go('bank')}
+async function delBT(id){if(!confirm('Delete this entry?'))return;const{error}=await sb.from('bank_txns').delete().eq('id',id);error?alert(error.message):go('bank')}
+
+// ================= NEW: MONTHLY EXPENSES =================
+const CATS=['Home','Food','Bills','Rent','Travel','Medical','Shopping','Daily use','Other'];
+pages.exp=async a=>{await load();const mo=(a&&a.m)||today().slice(0,7),E=D.ex.filter(x=>x.exp_date.slice(0,7)===mo),B=D.bk,bn=Object.fromEntries(B.map(b=>[b.id,b.name])),urls=await signed(E.flatMap(t=>t.proofs||[])),cat={},src={};
+ E.forEach(x=>{cat[x.category]=(cat[x.category]||0)+Number(x.amount);const k=bn[x.bank_id]||'No bank';src[k]=(src[k]||0)+Number(x.amount)});
+ const months=[...new Set([mo,...D.ex.map(x=>x.exp_date.slice(0,7))])].sort().reverse(),inc=sum(D.bt.filter(t=>t.kind==='in'&&t.tx_date.slice(0,7)===mo),x=>x.amount);
+ $('#main').innerHTML=`<div class="row2"><div><h1>Monthly expenses</h1><p class="mu">Home, daily use, everything you spend.</p></div><label style="min-width:170px">Month<select onchange="go('exp',{m:this.value})">${months.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select></label></div>
+ <div class="kp"><div><small>Came in (banks)</small><b class="pos">${fmt(inc)}</b></div><div><small>Spent</small><b class="neg">${fmt(sum(E,x=>x.amount))}</b></div><div><small>Net</small>${sg(inc-sum(E,x=>x.amount))}</div><div><small>Entries</small><b>${E.length}</b></div></div>
+ <div class="fg"><div class="card"><b>By category</b><table>${Object.entries(cat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')||'<tr><td class="mu">Nothing yet</td></tr>'}</table></div><div class="card"><b>Paid from (bank)</b><table>${Object.entries(src).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')||'<tr><td class="mu">Nothing yet</td></tr>'}</table></div></div>
+ <h2>Add expense</h2><div class="card np"><div class="fg"><label>Date<input id="xd" type="date" value="${today()}"></label><label>Amount<input id="xa" type="number" step="any"></label><label>Category<select id="xc">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Paid from bank<select id="xb"><option value="">— none —</option>${B.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></label><label>Title / note<input id="xn"></label></div><label>Proof photos (many allowed)<input id="xf" type="file" accept="image/*" multiple onchange="prevPhotos('xf','xpv')"></label><div class="pv" id="xpv"></div><button class="btn" onclick="addEx()">Save expense</button><p class="mu">If you pick a bank, its balance reduces automatically.</p></div>
+ <h2>${mo} entries</h2><div class="card ov"><table><tr><th>Date</th><th>Category</th><th>Note</th><th>Bank</th><th class="n">Amount</th><th>Proof</th><th class="np"></th></tr>${E.map(x=>`<tr><td>${x.exp_date}</td><td><span class="tag">${esc(x.category)}</span></td><td class="mu">${esc(x.note)}</td><td>${esc(bn[x.bank_id]||'')}</td><td class="n neg">${fmt(x.amount)}</td><td>${(x.proofs||[]).map(p=>urls[p]?`<a href="#" onclick="zoom('${urls[p]}');return false">proof</a>`:'').join(' ')}</td><td class="np"><button class="mu" onclick="editEx('${x.id}')">Edit</button> <button class="neg" onclick="delEx('${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td class="mu">No expenses this month.</td></tr>'}</table></div>`};
+// expense auto-creates a matching bank "out" entry (linked by expense_id) so bank balance stays right
+async function addEx(){const v=Number($('#xa').value);if(!v)return alert('Enter amount');const ps=await upPhotos($('#xf').files,'expense');if(!ps)return;const bid=$('#xb').value||null;
+ const{data,error}=await sb.from('expenses').insert({exp_date:$('#xd').value,amount:Math.abs(v),category:$('#xc').value,note:$('#xn').value,bank_id:bid,proofs:ps}).select().single();if(error)return alert(error.message);
+ if(bid){const r=await sb.from('bank_txns').insert({bank_id:bid,kind:'out',amount:Math.abs(v),tx_date:$('#xd').value,reason:'Expense: '+$('#xc').value,notes:$('#xn').value,expense_id:data.id});if(r.error)alert(r.error.message)}go('exp',{m:$('#xd').value.slice(0,7)})}
+async function editEx(id){const x=D.ex.find(r=>r.id===id),a=prompt('Amount',x.amount);if(a===null||isNaN(a))return;const d=prompt('Date (YYYY-MM-DD)',x.exp_date);if(d===null)return;const c=prompt('Category ('+CATS.join(', ')+')',x.category);if(c===null)return;const n=prompt('Note',x.note||'');if(n===null)return;
+ let{error}=await sb.from('expenses').update({amount:Math.abs(Number(a)),exp_date:d,category:c,note:n}).eq('id',id);if(error)return alert(error.message);
+ await sb.from('bank_txns').update({amount:Math.abs(Number(a)),tx_date:d,reason:'Expense: '+c,notes:n}).eq('expense_id',id);go('exp',{m:d.slice(0,7)})}
+async function delEx(id){if(!confirm('Delete this expense?'))return;await sb.from('bank_txns').delete().eq('expense_id',id);const{error}=await sb.from('expenses').delete().eq('id',id);error?alert(error.message):go('exp')}
+
+
+// ================= NEW: SETUPS + TRADING JOURNAL =================
+const tPnl=t=>Number(t.pnl||0),res=t=>t.pnl>0?'win':t.pnl<0?'loss':'be';
+function jstats(L){const w=L.filter(t=>t.pnl>0),l=L.filter(t=>t.pnl<0),n=L.length,tot=sum(L,tPnl);return{n,w:w.length,l:l.length,tot,wr:n?w.length/n*100:0,aw:w.length?sum(w,tPnl)/w.length:0,al:l.length?sum(l,tPnl)/l.length:0,amt:sum(L,t=>t.amount_used)}}
+const jkp=s=>`<div class="kp"><div><small>Trades</small><b>${s.n}</b></div><div><small>Win rate</small><b>${s.wr.toFixed(1)}%</b></div><div><small>Total profit / loss</small>${sg(s.tot)}</div><div><small>Avg win</small><b class="pos">${fmt(s.aw)}</b></div><div><small>Avg loss</small><b class="neg">${fmt(s.al)}</b></div><div><small>Total amount used</small><b>${fmt(s.amt)}</b></div></div>`;
+const tradeRow=(t,sn,urls,hideSetup)=>`<div class="card exp"><div class="row2"><div><b>${esc(t.symbol)}</b> <span class="tag ${(t.side||'').toLowerCase()}">${esc(t.side)}</span> <span class="tag ${res(t)}">${res(t)==='win'?'Win':res(t)==='loss'?'Loss':'Break-even'}</span>${hideSetup?'':` <span class="tag">${esc(sn[t.setup_id]||'No setup')}</span>`}<br><span class="mu">${t.trade_date} · ${esc(t.timeframe)}</span></div><div style="text-align:right">${sg(tPnl(t))}<br><span class="mu">Amount used: ${fmt(t.amount_used)}</span></div></div>
+ <div class="mu" style="margin-top:8px">Entry ${fmt(t.entry_price)} · Exit ${fmt(t.exit_price)} · SL ${fmt(t.stop_loss)} · Target ${fmt(t.target)} · Lots ${fmt(t.lot_size)}</div>
+ ${t.reason?`<p style="margin:8px 0 2px"><b>Reason:</b> ${esc(t.reason)}</p>`:''}${t.notes?`<p style="margin:2px 0" class="mu"><b>Review / lesson:</b> ${esc(t.notes)}</p>`:''}
+ <div class="shots">${D.ss.filter(s=>s.trade_id===t.id).map(s=>urls[s.path]?`<img src="${urls[s.path]}" onclick="zoom('${urls[s.path]}')">`:'').join('')}</div>
+ <div class="np"><button class="mu" onclick="editTrade('${t.id}')">Edit</button> <button class="mu" onclick="addShots('${t.id}')">+ Photos</button> <button class="neg" onclick="delTrade('${t.id}')">Delete</button></div></div>`;
+const tradeUrls=()=>signed(D.ss.map(s=>s.path));
+
+pages.jr=async a=>{await load();const sf=(a&&a.s)||'',L=D.jt.filter(t=>!sf||t.setup_id===sf),sn=Object.fromEntries(D.sp.map(s=>[s.id,s.name])),urls=await tradeUrls();
+ $('#main').innerHTML=`<div class="row2"><div><h1>Trading journal</h1><p class="mu">Every trade with reason, amount and photos.</p></div><label style="min-width:200px">Filter by setup<select onchange="go('jr',{s:this.value})"><option value="">All setups</option>${D.sp.map(s=>`<option value="${s.id}" ${s.id===sf?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label></div>${jkp(jstats(L))}
+ <h2>Add trade</h2><div class="card np"><div class="fg"><label>Date<input id="jd" type="date" value="${today()}"></label><label>Symbol<input id="js" placeholder="XAUUSD, EURUSD..."></label><label>Side<select id="jsd"><option>Buy</option><option>Sell</option></select></label><label>Setup<select id="jsu"><option value="">— choose setup —</option>${D.sp.map(s=>`<option value="${s.id}" ${s.id===sf?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label><label>Timeframe<input id="jtf" placeholder="5m"></label><label>Amount used<input id="jam" type="number" step="any"></label><label>Lot size<input id="jl" type="number" step="any"></label><label>Entry price<input id="je" type="number" step="any"></label><label>Exit price<input id="jx" type="number" step="any"></label><label>Stop loss<input id="jsl" type="number" step="any"></label><label>Target<input id="jtg" type="number" step="any"></label><label>Profit / loss (minus for loss)<input id="jp" type="number" step="any"></label></div><label>Reason for taking this trade<textarea id="jr"></textarea></label><label>Review / lesson<textarea id="jn"></textarea></label><label>Trade photos (5-6 or more, select together)<input id="jf" type="file" accept="image/*" multiple onchange="prevPhotos('jf','jpv')"></label><div class="pv" id="jpv"></div><button class="btn" onclick="addTrade()">Save trade</button></div>
+ <h2>${L.length} trade${L.length==1?'':'s'}</h2>${L.map(t=>tradeRow(t,sn,urls,false)).join('')||'<div class="card mu">No trades yet.</div>'}`};
+async function addTrade(){const f=k=>$('#'+k).value,N=k=>f(k)===''?null:Number(f(k));if(!f('js').trim())return alert('Enter symbol');
+ const{data,error}=await sb.from('journal_trades').insert({trade_date:f('jd'),symbol:f('js').trim().toUpperCase(),side:f('jsd'),setup_id:f('jsu')||null,timeframe:f('jtf'),amount_used:N('jam'),lot_size:N('jl'),entry_price:N('je'),exit_price:N('jx'),stop_loss:N('jsl'),target:N('jtg'),pnl:N('jp'),reason:f('jr'),notes:f('jn')}).select().single();if(error)return alert(error.message);
+ const ps=await upPhotos($('#jf').files,'trades');if(ps&&ps.length){const r=await sb.from('trade_shots').insert(ps.map(p=>({trade_id:data.id,path:p})));if(r.error)alert(r.error.message)}go('jr')}
+async function editTrade(id){const t=D.jt.find(x=>x.id===id),P=(m,v)=>prompt(m,v??''),g={};
+ const f=[['symbol','Symbol'],['side','Side (Buy/Sell)'],['timeframe','Timeframe'],['amount_used','Amount used'],['lot_size','Lot size'],['entry_price','Entry price'],['exit_price','Exit price'],['stop_loss','Stop loss'],['target','Target'],['pnl','Profit / loss'],['reason','Reason'],['notes','Review / lesson'],['trade_date','Date (YYYY-MM-DD)']];
+ for(const[k,l]of f){const v=P(l,t[k]);if(v===null)return;g[k]=['amount_used','lot_size','entry_price','exit_price','stop_loss','target','pnl'].includes(k)?(v===''?null:Number(v)):v}
+ const s=prompt('Setup name (leave same to keep). Available: '+D.sp.map(x=>x.name).join(' | '),D.sp.find(x=>x.id===t.setup_id)?.name||'');if(s!==null){const m=D.sp.find(x=>x.name.toLowerCase()===s.trim().toLowerCase());if(m)g.setup_id=m.id}
+ const{error}=await sb.from('journal_trades').update(g).eq('id',id);error?alert(error.message):go('jr')}
+function addShots(id){const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;i.onchange=async()=>{const ps=await upPhotos(i.files,'trades');if(ps&&ps.length){const r=await sb.from('trade_shots').insert(ps.map(p=>({trade_id:id,path:p})));if(r.error)alert(r.error.message)}go('jr')};i.click()}
+async function delTrade(id){if(!confirm('Delete this trade and its photos?'))return;const{error}=await sb.from('journal_trades').delete().eq('id',id);error?alert(error.message):go('jr')}
+
+pages.setup=async a=>{await load();const sid=a&&a.id;
+ if(sid){const s=D.sp.find(x=>x.id===sid);if(!s)return go('setup');const L=D.jt.filter(t=>t.setup_id===sid),urls=await tradeUrls(),sn={[sid]:s.name};
+  return $('#main').innerHTML=`<button class="mu np" onclick="go('setup')">← All setups</button><h1>${esc(s.name)}</h1><p class="mu">${esc(s.description)}</p><div class="np"><button class="btn o" onclick="editSetup('${sid}')">Edit setup</button></div>${jkp(jstats(L))}<h2>Trades on this setup</h2>${L.map(t=>tradeRow(t,sn,urls,true)).join('')||'<div class="card mu">No trades on this setup yet. Add one in Journal and choose this setup.</div>'}`}
+ const rows=D.sp.map(s=>({s,st:jstats(D.jt.filter(t=>t.setup_id===s.id))})),un=jstats(D.jt.filter(t=>!t.setup_id));
+ $('#main').innerHTML=`<h1>Setups</h1><p class="mu">Every setup has its own section. Tap one to see only its trades.</p>
+ <div class="card ov"><table><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Profit / loss</th></tr>${rows.map(({s,st})=>`<tr class="go" onclick="go('setup',{id:'${s.id}'})"><td><b>${esc(s.name)}</b><br><span class="mu">${esc(s.description)}</span></td><td class="n">${st.n}</td><td class="n">${st.wr.toFixed(1)}%</td><td class="n">${sg(st.tot)}</td></tr>`).join('')||'<tr><td class="mu">No setups yet. Add your first below.</td></tr>'}${un.n?`<tr><td class="mu">No setup chosen</td><td class="n">${un.n}</td><td class="n">${un.wr.toFixed(1)}%</td><td class="n">${sg(un.tot)}</td></tr>`:''}</table></div>
+ <h2>Add setup</h2><div class="card np"><div class="fg"><label>Setup name<input id="sn" placeholder="5m timeframe + 30s Renko"></label><label>Description / rules<input id="sd"></label></div><button class="btn" onclick="addSetup()">Save setup</button></div>`};
+async function addSetup(){const n=$('#sn').value.trim();if(!n)return alert('Enter setup name');const{error}=await sb.from('setups').insert({name:n,description:$('#sd').value});error?alert(error.message):go('setup')}
+async function editSetup(id){const s=D.sp.find(x=>x.id===id),n=prompt('Setup name',s.name);if(n===null||!n.trim())return;const d=prompt('Description',s.description||'');if(d===null)return;const{error}=await sb.from('setups').update({name:n.trim(),description:d}).eq('id',id);error?alert(error.message):go('setup',{id})}
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 start();
